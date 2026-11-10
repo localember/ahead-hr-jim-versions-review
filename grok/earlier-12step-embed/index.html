@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AHEAD HR 12-step embed (earlier Grok revision) - Design Preview</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Internal design preview only. Not the live hrstaff.net site.">
+<style>
+.le-preview-banner {
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  background: #fff3cd;
+  color: #1a1a1a;
+  border-bottom: 2px solid #856404;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  position: relative;
+  z-index: 99999;
+  box-sizing: border-box;
+}
+</style>
+</head>
+<body style="margin:0;">
+<div class="le-preview-banner" role="note">Design preview, not live</div>
+<!-- AHEAD Human Resources – 12-Step Needs Assessment -->
+<!-- Copy everything below and paste into your page (or a dedicated page) -->
+<div id="ahead-assessment" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 720px; margin: 0 auto; padding: 20px 16px; color: #1a1a1a; line-height: 1.5;">
+  <style>
+    #ahead-assessment * { box-sizing: border-box; }
+    #ahead-assessment h1 { font-size: 1.75rem; color: #003366; font-weight: 700; margin: 0 0 6px; text-align: center; }
+    #ahead-assessment .subtitle { text-align: center; color: #5a6a7a; margin-bottom: 24px; }
+    #ahead-assessment .progress-wrap { background: #e9eef4; border-radius: 999px; height: 8px; margin: 16px 0 8px; overflow: hidden; }
+    #ahead-assessment .progress-bar { height: 100%; background: linear-gradient(90deg, #0077b6, #003366); width: 0%; transition: width 0.35s ease; border-radius: 999px; }
+    #ahead-assessment .step-label { text-align: center; font-size: 0.85rem; color: #5a6a7a; margin-bottom: 20px; font-weight: 500; }
+    #ahead-assessment .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); padding: 32px 28px; }
+    #ahead-assessment .step { display: none; }
+    #ahead-assessment .step.active { display: block; }
+    #ahead-assessment h2 { font-size: 1.35rem; color: #003366; margin: 0 0 8px; font-weight: 600; }
+    #ahead-assessment .help-text { color: #5a6a7a; font-size: 0.95rem; margin-bottom: 22px; }
+    #ahead-assessment .options { display: flex; flex-direction: column; gap: 10px; }
+    #ahead-assessment .option { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1.5px solid #dde3ea; border-radius: 10px; cursor: pointer; transition: all 0.15s ease; background: #fff; }
+    #ahead-assessment .option:hover { border-color: #0077b6; background: #e6f2fa; }
+    #ahead-assessment .option.selected { border-color: #0077b6; background: #e6f2fa; }
+    #ahead-assessment .option input { margin-top: 3px; accent-color: #0077b6; }
+    #ahead-assessment .option label { cursor: pointer; flex: 1; font-size: 0.98rem; }
+    #ahead-assessment .form-group { margin-bottom: 16px; }
+    #ahead-assessment .form-group label { display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.95rem; }
+    #ahead-assessment .form-group input,
+    #ahead-assessment .form-group textarea { width: 100%; padding: 12px 14px; border: 1.5px solid #dde3ea; border-radius: 8px; font-size: 1rem; font-family: inherit; }
+    #ahead-assessment .form-group input:focus,
+    #ahead-assessment .form-group textarea:focus { outline: none; border-color: #0077b6; }
+    #ahead-assessment .form-group textarea { min-height: 80px; resize: vertical; }
+    #ahead-assessment .nav-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 28px; }
+    #ahead-assessment button { padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s ease; }
+    #ahead-assessment .btn-next, #ahead-assessment .btn-submit { background: #003366; color: white; min-width: 140px; }
+    #ahead-assessment .btn-next:hover, #ahead-assessment .btn-submit:hover { background: #002244; }
+    #ahead-assessment .btn-back { background: transparent; color: #5a6a7a; border: 1.5px solid #dde3ea; }
+    #ahead-assessment .btn-back:hover { background: #f0f2f5; }
+    #ahead-assessment .btn-back:disabled { opacity: 0.4; cursor: not-allowed; }
+    #ahead-assessment .success { text-align: center; padding: 20px 0; }
+    #ahead-assessment .success h2 { color: #2e7d32; }
+    #ahead-assessment .summary { background: #f8fafc; border-radius: 10px; padding: 16px; text-align: left; font-size: 0.9rem; margin: 20px 0; max-height: 240px; overflow-y: auto; }
+    #ahead-assessment .footer-note { text-align: center; font-size: 0.8rem; color: #5a6a7a; margin-top: 24px; }
+    @media (max-width: 600px) {
+      #ahead-assessment .card { padding: 24px 18px; }
+      #ahead-assessment .nav-buttons { flex-direction: column-reverse; }
+      #ahead-assessment button { width: 100%; }
+    }
+  </style>
+
+  <h1>AHEAD Human Resources</h1>
+  <p class="subtitle">Tell us about your needs — we’ll help you find the right staffing, PEO, or HR solution.</p>
+
+  <div class="progress-wrap"><div class="progress-bar" id="ahead-progressBar"></div></div>
+  <div class="step-label" id="ahead-stepLabel">Step 1 of 12</div>
+
+  <div class="card">
+    <!-- Step 1 -->
+    <div class="step active" data-step="1">
+      <h2>How many employees does your company have?</h2>
+      <p class="help-text">This helps us understand the scale of support that will work best for you.</p>
+      <div class="options" data-name="companySize">
+        <div class="option"><input type="radio" name="companySize" value="1-10"><label>1 – 10 employees</label></div>
+        <div class="option"><input type="radio" name="companySize" value="11-25"><label>11 – 25 employees</label></div>
+        <div class="option"><input type="radio" name="companySize" value="26-50"><label>26 – 50 employees</label></div>
+        <div class="option"><input type="radio" name="companySize" value="51-100"><label>51 – 100 employees</label></div>
+        <div class="option"><input type="radio" name="companySize" value="101-250"><label>101 – 250 employees</label></div>
+        <div class="option"><input type="radio" name="companySize" value="251+"><label>251+ employees</label></div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step" data-step="2">
+      <h2>What industry is your business in?</h2>
+      <p class="help-text">We serve a wide range of industries across the Louisville area and beyond.</p>
+      <div class="options" data-name="industry">
+        <div class="option"><input type="radio" name="industry" value="Manufacturing / Light Industrial"><label>Manufacturing / Light Industrial</label></div>
+        <div class="option"><input type="radio" name="industry" value="Construction / Trades"><label>Construction / Trades</label></div>
+        <div class="option"><input type="radio" name="industry" value="Healthcare"><label>Healthcare</label></div>
+        <div class="option"><input type="radio" name="industry" value="Professional Services"><label>Professional Services</label></div>
+        <div class="option"><input type="radio" name="industry" value="Retail / Hospitality"><label>Retail / Hospitality</label></div>
+        <div class="option"><input type="radio" name="industry" value="Non-Profit / Education"><label>Non-Profit / Education</label></div>
+        <div class="option"><input type="radio" name="industry" value="Other"><label>Other</label></div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step" data-step="3">
+      <h2>Where are your employees located?</h2>
+      <p class="help-text">This helps us determine compliance, workers’ compensation, and staffing coverage.</p>
+      <div class="options" data-name="locations">
+        <div class="option"><input type="radio" name="locations" value="Louisville metro only"><label>Louisville metro area only</label></div>
+        <div class="option"><input type="radio" name="locations" value="Kentucky (multiple locations)"><label>Multiple locations in Kentucky</label></div>
+        <div class="option"><input type="radio" name="locations" value="Multi-state"><label>Multiple states</label></div>
+        <div class="option"><input type="radio" name="locations" value="Mostly remote / hybrid"><label>Mostly remote or hybrid</label></div>
+        <div class="option"><input type="radio" name="locations" value="Not sure / varies"><label>Not sure / varies</label></div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step" data-step="4">
+      <h2>What are you primarily looking for right now?</h2>
+      <p class="help-text">Select the main reason you’re exploring options.</p>
+      <div class="options" data-name="primaryNeed">
+        <div class="option"><input type="radio" name="primaryNeed" value="PEO / co-employment"><label>PEO (Professional Employer Organization) services</label></div>
+        <div class="option"><input type="radio" name="primaryNeed" value="HR outsourcing / ASO"><label>HR outsourcing / Administrative services</label></div>
+        <div class="option"><input type="radio" name="primaryNeed" value="Staffing / recruiting"><label>Staffing or recruiting help</label></div>
+        <div class="option"><input type="radio" name="primaryNeed" value="Payroll only"><label>Payroll services</label></div>
+        <div class="option"><input type="radio" name="primaryNeed" value="Full HR support package"><label>A combination of the above</label></div>
+        <div class="option"><input type="radio" name="primaryNeed" value="Just exploring"><label>Just exploring options</label></div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step" data-step="5">
+      <h2>Which services are most important to you?</h2>
+      <p class="help-text">Select all that apply.</p>
+      <div class="options" data-name="services" data-multi="true">
+        <div class="option"><input type="checkbox" name="services" value="Payroll processing"><label>Payroll processing</label></div>
+        <div class="option"><input type="checkbox" name="services" value="Employee benefits"><label>Employee benefits (medical, dental, 401k, etc.)</label></div>
+        <div class="option"><input type="checkbox" name="services" value="Compliance & risk management"><label>Compliance & risk management</label></div>
+        <div class="option"><input type="checkbox" name="services" value="Workers’ compensation"><label>Workers’ compensation</label></div>
+        <div class="option"><input type="checkbox" name="services" value="Employee handbook & policies"><label>Employee handbook & policies</label></div>
+        <div class="option"><input type="checkbox" name="services" value="Recruiting / staffing"><label>Recruiting / temporary or permanent staffing</label></div>
+        <div class="option"><input type="checkbox" name="services" value="Employee relations support"><label>Day-to-day employee relations support</label></div>
+        <div class="option"><input type="checkbox" name="services" value="Time & attendance"><label>Time & attendance</label></div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step" data-step="6">
+      <h2>How are you handling HR and payroll today?</h2>
+      <p class="help-text">This helps us understand the transition that would work best.</p>
+      <div class="options" data-name="currentSetup">
+        <div class="option"><input type="radio" name="currentSetup" value="In-house / internal staff"><label>Fully in-house with internal staff</label></div>
+        <div class="option"><input type="radio" name="currentSetup" value="Payroll software only"><label>Using payroll software (e.g., QuickBooks, ADP, etc.)</label></div>
+        <div class="option"><input type="radio" name="currentSetup" value="Existing PEO or HRO"><label>Already with a PEO or HR outsourcing provider</label></div>
+        <div class="option"><input type="radio" name="currentSetup" value="Accountant / bookkeeper"><label>Handled by an accountant or bookkeeper</label></div>
+        <div class="option"><input type="radio" name="currentSetup" value="Mix of the above"><label>A mix of the above</label></div>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="step" data-step="7">
+      <h2>How important are competitive employee benefits to you?</h2>
+      <p class="help-text">Many clients come to us to offer better benefits at a better cost.</p>
+      <div class="options" data-name="benefitsPriority">
+        <div class="option"><input type="radio" name="benefitsPriority" value="Very important – top priority"><label>Very important – it’s a top priority</label></div>
+        <div class="option"><input type="radio" name="benefitsPriority" value="Important – want better options"><label>Important – we want better or more affordable options</label></div>
+        <div class="option"><input type="radio" name="benefitsPriority" value="Somewhat important"><label>Somewhat important</label></div>
+        <div class="option"><input type="radio" name="benefitsPriority" value="Not a current focus"><label>Not a current focus</label></div>
+      </div>
+    </div>
+
+    <!-- Step 8 -->
+    <div class="step" data-step="8">
+      <h2>What compliance or risk areas concern you most?</h2>
+      <p class="help-text">Select all that apply.</p>
+      <div class="options" data-name="compliance" data-multi="true">
+        <div class="option"><input type="checkbox" name="compliance" value="Payroll taxes & filings"><label>Payroll taxes and filings</label></div>
+        <div class="option"><input type="checkbox" name="compliance" value="Multi-state employment"><label>Multi-state employment rules</label></div>
+        <div class="option"><input type="checkbox" name="compliance" value="Workers’ compensation"><label>Workers’ compensation</label></div>
+        <div class="option"><input type="checkbox" name="compliance" value="Employee classification"><label>Employee classification (exempt/non-exempt, contractor)</label></div>
+        <div class="option"><input type="checkbox" name="compliance" value="Handbook & policies"><label>Employee handbook and policies</label></div>
+        <div class="option"><input type="checkbox" name="compliance" value="Unemployment claims"><label>Unemployment claims</label></div>
+        <div class="option"><input type="checkbox" name="compliance" value="None in particular"><label>None in particular right now</label></div>
+      </div>
+    </div>
+
+    <!-- Step 9 -->
+    <div class="step" data-step="9">
+      <h2>When are you hoping to make a decision or start?</h2>
+      <p class="help-text">No pressure — just helps us prepare the right conversation.</p>
+      <div class="options" data-name="timeline">
+        <div class="option"><input type="radio" name="timeline" value="As soon as possible"><label>As soon as possible</label></div>
+        <div class="option"><input type="radio" name="timeline" value="Within 30 days"><label>Within the next 30 days</label></div>
+        <div class="option"><input type="radio" name="timeline" value="1-3 months"><label>In the next 1–3 months</label></div>
+        <div class="option"><input type="radio" name="timeline" value="Just researching"><label>Just researching for now</label></div>
+      </div>
+    </div>
+
+    <!-- Step 10 -->
+    <div class="step" data-step="10">
+      <h2>Do you also need help with staffing or recruiting?</h2>
+      <p class="help-text">We provide temporary, temp-to-hire, and direct-hire support.</p>
+      <div class="options" data-name="staffingNeed">
+        <div class="option"><input type="radio" name="staffingNeed" value="Yes – ongoing temporary staffing"><label>Yes – ongoing temporary staffing</label></div>
+        <div class="option"><input type="radio" name="staffingNeed" value="Yes – specific roles to fill"><label>Yes – specific roles to fill (temp-to-hire or direct)</label></div>
+        <div class="option"><input type="radio" name="staffingNeed" value="Possibly in the future"><label>Possibly in the future</label></div>
+        <div class="option"><input type="radio" name="staffingNeed" value="No – focused on HR/PEO only"><label>No – focused on HR / PEO only</label></div>
+      </div>
+    </div>
+
+    <!-- Step 11 -->
+    <div class="step" data-step="11">
+      <h2>Who will be involved in the decision?</h2>
+      <p class="help-text">This helps us tailor the conversation appropriately.</p>
+      <div class="options" data-name="decisionMakers">
+        <div class="option"><input type="radio" name="decisionMakers" value="Owner / CEO only"><label>Owner or CEO only</label></div>
+        <div class="option"><input type="radio" name="decisionMakers" value="Owner + one other"><label>Owner plus one other person</label></div>
+        <div class="option"><input type="radio" name="decisionMakers" value="Small leadership team"><label>Small leadership team</label></div>
+        <div class="option"><input type="radio" name="decisionMakers" value="Larger team / committee"><label>Larger team or committee</label></div>
+      </div>
+    </div>
+
+    <!-- Step 12 -->
+    <div class="step" data-step="12">
+      <h2>Let’s talk about your needs</h2>
+      <p class="help-text">Share your contact information and a member of the AHEAD team will reach out to discuss the best options for your business.</p>
+      <div class="form-group">
+        <label for="ahead-fullName">Full Name *</label>
+        <input type="text" id="ahead-fullName" required placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label for="ahead-email">Email *</label>
+        <input type="email" id="ahead-email" required placeholder="you@company.com">
+      </div>
+      <div class="form-group">
+        <label for="ahead-phone">Phone</label>
+        <input type="tel" id="ahead-phone" placeholder="[PHONE: confirm with Jim]">
+      </div>
+      <div class="form-group">
+        <label for="ahead-company">Company Name *</label>
+        <input type="text" id="ahead-company" required placeholder="Your company">
+      </div>
+      <div class="form-group">
+        <label for="ahead-role">Your Role</label>
+        <input type="text" id="ahead-role" placeholder="e.g., Owner, HR Manager, Office Manager">
+      </div>
+      <div class="form-group">
+        <label for="ahead-notes">Anything else we should know?</label>
+        <textarea id="ahead-notes" placeholder="Optional notes about your situation or questions"></textarea>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="step" data-step="success">
+      <div class="success">
+        <h2>Thank you!</h2>
+        <p>A member of the AHEAD Human Resources team will be in touch shortly to discuss your needs and how we can support your business.</p>
+        <div class="summary" id="ahead-summaryBox"></div>
+        <p style="font-size:0.9rem;">You can also reach us directly at [PHONE: confirm with Jim] or info@aheadhr.com.</p>
+      </div>
+    </div>
+
+    <div class="nav-buttons" id="ahead-navButtons">
+      <button type="button" class="btn-back" id="ahead-btnBack" disabled>Back</button>
+      <button type="button" class="btn-next" id="ahead-btnNext">Next</button>
+    </div>
+  </div>
+
+  <p class="footer-note">AHEAD Human Resources • Louisville, KY • Serving businesses since 1995</p>
+</div>
+
+<script>
+(function() {
+  const totalSteps = 12;
+  let currentStep = 1;
+  const answers = {};
+
+  const root = document.getElementById('ahead-assessment');
+  const progressBar = root.querySelector('#ahead-progressBar');
+  const stepLabel = root.querySelector('#ahead-stepLabel');
+  const btnBack = root.querySelector('#ahead-btnBack');
+  const btnNext = root.querySelector('#ahead-btnNext');
+  const navButtons = root.querySelector('#ahead-navButtons');
+
+  function updateProgress() {
+    const pct = ((currentStep - 1) / totalSteps) * 100;
+    progressBar.style.width = pct + '%';
+    stepLabel.textContent = currentStep <= totalSteps ? `Step ${currentStep} of ${totalSteps}` : 'Complete';
+  }
+
+  function showStep(n) {
+    root.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+    const target = root.querySelector(`.step[data-step="${n}"]`) || root.querySelector('.step[data-step="success"]');
+    if (target) target.classList.add('active');
+    currentStep = n;
+    updateProgress();
+    btnBack.disabled = n <= 1;
+    if (n === totalSteps) {
+      btnNext.textContent = 'Request Contact';
+      btnNext.className = 'btn-submit';
+    } else if (n === 'success') {
+      navButtons.style.display = 'none';
+    } else {
+      btnNext.textContent = 'Next';
+      btnNext.className = 'btn-next';
+      navButtons.style.display = 'flex';
+    }
+  }
+
+  function collectCurrentStep() {
+    const stepEl = root.querySelector(`.step[data-step="${currentStep}"]`);
+    if (!stepEl) return true;
+
+    if (currentStep === 12) {
+      const fullName = root.querySelector('#ahead-fullName').value.trim();
+      const email = root.querySelector('#ahead-email').value.trim();
+      const company = root.querySelector('#ahead-company').value.trim();
+      if (!fullName || !email || !company) {
+        alert('Please fill in Name, Email, and Company Name.');
+        return false;
+      }
+      answers.contact = {
+        fullName,
+        email,
+        phone: root.querySelector('#ahead-phone').value.trim(),
+        company,
+        role: root.querySelector('#ahead-role').value.trim(),
+        notes: root.querySelector('#ahead-notes').value.trim()
+      };
+      return true;
+    }
+
+    const optionsDiv = stepEl.querySelector('.options');
+    if (!optionsDiv) return true;
+
+    const name = optionsDiv.dataset.name;
+    const isMulti = optionsDiv.dataset.multi === 'true';
+    const inputs = optionsDiv.querySelectorAll('input');
+
+    if (isMulti) {
+      const selected = Array.from(inputs).filter(i => i.checked).map(i => i.value);
+      if (selected.length === 0) {
+        alert('Please select at least one option.');
+        return false;
+      }
+      answers[name] = selected;
+    } else {
+      const selected = Array.from(inputs).find(i => i.checked);
+      if (!selected) {
+        alert('Please select an option to continue.');
+        return false;
+      }
+      answers[name] = selected.value;
+    }
+    return true;
+  }
+
+  function buildSummary() {
+    let html = '';
+    const labels = {
+      companySize: 'Company Size',
+      industry: 'Industry',
+      locations: 'Locations',
+      primaryNeed: 'Primary Need',
+      services: 'Services of Interest',
+      currentSetup: 'Current Setup',
+      benefitsPriority: 'Benefits Priority',
+      compliance: 'Compliance Concerns',
+      timeline: 'Timeline',
+      staffingNeed: 'Staffing Needs',
+      decisionMakers: 'Decision Makers'
+    };
+    for (const [key, label] of Object.entries(labels)) {
+      if (answers[key]) {
+        const val = Array.isArray(answers[key]) ? answers[key].join(', ') : answers[key];
+        html += `<div><strong>${label}:</strong> ${val}</div>`;
+      }
+    }
+    if (answers.contact) {
+      html += `<hr style="margin:10px 0;border:none;border-top:1px solid #ddd;">`;
+      html += `<div><strong>Contact:</strong> ${answers.contact.fullName} (${answers.contact.email})</div>`;
+      html += `<div><strong>Company:</strong> ${answers.contact.company}</div>`;
+      if (answers.contact.phone) html += `<div><strong>Phone:</strong> ${answers.contact.phone}</div>`;
+      if (answers.contact.role) html += `<div><strong>Role:</strong> ${answers.contact.role}</div>`;
+      if (answers.contact.notes) html += `<div><strong>Notes:</strong> ${answers.contact.notes}</div>`;
+    }
+    return html;
+  }
+
+  btnNext.addEventListener('click', () => {
+    if (!collectCurrentStep()) return;
+    if (currentStep === totalSteps) {
+      root.querySelector('#ahead-summaryBox').innerHTML = buildSummary();
+      showStep('success');
+      console.log('AHEAD Lead captured:', answers);
+      // To send leads: uncomment and set your endpoint
+      // fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(answers)
+      // });
+      return;
+    }
+    showStep(currentStep + 1);
+  });
+
+  btnBack.addEventListener('click', () => {
+    if (currentStep > 1) showStep(currentStep - 1);
+  });
+
+  root.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const input = opt.querySelector('input');
+      if (input.type === 'radio') {
+        opt.parentElement.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        input.checked = true;
+      } else {
+        input.checked = !input.checked;
+        opt.classList.toggle('selected', input.checked);
+      }
+    });
+  });
+
+  updateProgress();
+})();
+</script>
+
+<script>
+/* Preview-only guard. Not part of Jim's original tool. */
+(function () {
+  document.addEventListener('submit', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+  var block = function () {
+    return Promise.reject(new Error('Preview only: network disabled'));
+  };
+  try { window.fetch = block; } catch (e) {}
+  try {
+    window.XMLHttpRequest = function () {
+      this.open = function () {};
+      this.send = function () {};
+      this.setRequestHeader = function () {};
+    };
+  } catch (e) {}
+  try { navigator.sendBeacon = function () { return false; }; } catch (e) {}
+})();
+</script>
+
+</body>
+</html>
