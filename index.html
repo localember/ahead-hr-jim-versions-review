@@ -11,6 +11,7 @@
   .le-preview-banner { font-family: system-ui, sans-serif; background: #fff3cd; color: #1a1a1a; border-bottom: 2px solid #856404; text-align: center; padding: 8px 12px; font-size: 14px; font-weight: 600; }
   main { max-width: 800px; margin: 0 auto; padding: 28px 20px 48px; }
   h1 { font-size: 1.6rem; margin: 0 0 8px; }
+  h2 { font-size: 1.2rem; margin: 28px 0 8px; }
   .note { background: #fff; border: 1px solid #dde3ea; border-radius: 12px; padding: 16px 18px; margin: 16px 0 24px; }
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
@@ -18,7 +19,7 @@
   a.card:hover { border-color: #003366; }
   a.card h2 { margin: 0 0 8px; font-size: 1.15rem; color: #003366; }
   .muted { color: #5a6a7a; font-size: 0.95rem; }
-  .extra { margin-top: 28px; }
+  .extra { margin-top: 8px; }
   .extra ul { padding-left: 20px; }
   .flag { background: #fff3cd; border-left: 4px solid #856404; padding: 10px 12px; margin: 12px 0; }
 </style>
@@ -27,34 +28,29 @@
 <div class="le-preview-banner" role="note">Design preview, not live</div>
 <main>
   <h1>Jim's AHEAD guided HR tools</h1>
-  <p class="muted">Internal Local Ember preview. Not on hrstaff.net. Each page stays as close to Jim's original file as possible.</p>
-
-  <div class="note">
-    <strong>Side-by-side compare note.</strong>
-    The file Jim emailed (labeled Claude version: <code>ahead-hr-wisconsin-7step.html</code>) is <strong>byte-identical</strong> to the latest file in the Grok share titled "HR Software Selection Tool with 12 Steps."
-    In that share, Grok first built 12-step versions, then Jim asked for AHEAD HR Wisconsin and the same number of steps as the SHRM example. Grok's latest output is this 7-step Wisconsin tool (18,060 bytes). Jim then emailed that same file.
-    The two primary preview pages below therefore show the same 7-step tool (each with only the allowed preview edits). Earlier 12-step revisions from the same Grok conversation are linked under Extras so you can still compare those with the 7-step version.
-  </div>
+  <p class="muted">Internal Local Ember preview. Not on hrstaff.net. Hosted tools stay as close to Jim's original files as possible.</p>
 
   <div class="flag"><strong>Phone flag:</strong> Every phone number in these previews was replaced with <code>[PHONE: confirm with Jim]</code>. Jim's materials conflict: (920) 593-1208 vs 920-436-9887. Confirm the public number with Jim before any live build.</div>
 
+  <h2>Latest versions</h2>
   <div class="cards">
     <a class="card" href="./claude/">
-      <h2>Claude / email version</h2>
-      <p>7-step AHEAD HR Wisconsin tool from the Gmail attachment <code>ahead-hr-wisconsin-7step.html</code>.</p>
-      <p class="muted">Open preview</p>
+      <h2>Claude HR Navigator (problem solving, latest)</h2>
+      <p>Jim's Claude artifact (updated the night before this preview). We could not capture a standalone copy: the artifact requires a Claude sign-in, so this card opens a note and the original link rather than a hosted tool.</p>
+      <p class="muted">Open note and original link</p>
     </a>
     <a class="card" href="./grok/">
-      <h2>Grok version (latest)</h2>
-      <p>Latest file in the shared Grok conversation: the same 7-step Wisconsin tool, recovered from the public share JSON and asset URL.</p>
+      <h2>Grok navigator (what a prospect is looking for, latest)</h2>
+      <p>Latest file from Jim's new Grok share: a 7-step tool with the header "AHEAD HR and Staffing," optional staffing-agency fields on step 4, and email/CRM wiring. Forms in this preview do not send.</p>
       <p class="muted">Open preview</p>
     </a>
   </div>
 
   <div class="extra">
-    <h2>Extras: earlier Grok revisions (not the latest)</h2>
-    <p class="muted">These are earlier files from the same share, before the Wisconsin / 7-step update. Labeled so they are not mistaken for the latest Grok version.</p>
+    <h2>Older versions</h2>
+    <p class="muted">Earlier files, labeled so they are not mistaken for the latest versions. The two items previously shown as "Claude" and "Grok" were the same 7-step file; that file is kept once, below.</p>
     <ul>
+      <li><a href="./grok/earlier-7step/">Earlier 7-step</a> (the file previously shown under both /claude/ and /grok/; header "AHEAD HR Wisconsin")</li>
       <li><a href="./grok/earlier-12step/">Earlier 12-step standalone</a> (AHEAD Human Resources branding, Louisville contact in the original)</li>
       <li><a href="./grok/earlier-12step-embed/">Earlier 12-step copy-and-paste embed</a></li>
     </ul>

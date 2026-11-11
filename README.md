@@ -2,11 +2,14 @@
 
 Preview only. Not the live site. Not for indexing.
 
-Two primary pages:
+Latest:
 
-- /claude/ : Gmail attachment ahead-hr-wisconsin-7step.html (message 1a1c0f9f9d8c6fb0)
-- /grok/ : latest file from the public Grok share "HR Software Selection Tool with 12 Steps"
+- /claude/ : Jim's Claude HR Navigator (problem solving). The artifact at https://claude.ai/artifact/MgrHMgPKGgDWX5sWAD9j8T requires a Claude sign-in, so a standalone copy could not be captured. The page is a note plus the original link.
+- /grok/ : latest file from Jim's new public Grok share (ahead-hr-wisconsin-7step-email.html, header "AHEAD HR and Staffing").
 
-Those two source files are byte-identical (7-step Wisconsin tool). Earlier 12-step Grok revisions are at /grok/earlier-12step/ and /grok/earlier-12step-embed/.
+Older versions:
+
+- /grok/earlier-7step/ : the 7-step file previously shown under both /claude/ and /grok/ (those two were byte-identical).
+- /grok/earlier-12step/ and /grok/earlier-12step-embed/ : earlier 12-step Grok revisions.
 
 Allowed edits only: noindex, preview banner, form/network guard, phone numbers replaced with [PHONE: confirm with Jim].

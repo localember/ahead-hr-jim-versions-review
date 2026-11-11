@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AHEAD HR Wisconsin 7-step (Grok latest) - Design Preview</title>
+<title>AHEAD HR and Staffing 7-step (Grok latest) - Design Preview</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Internal design preview only. Not the live hrstaff.net site.">
 <style>
@@ -25,7 +25,7 @@
 </head>
 <body style="margin:0;">
 <div class="le-preview-banner" role="note">Design preview, not live</div>
-<!-- AHEAD HR Wisconsin – 7-Step Needs Assessment -->
+<!-- AHEAD HR Wisconsin – 7-Step Needs Assessment (with email + CRM ready) -->
 <!-- Copy everything below and paste into your page -->
 <div id="ahead-assessment" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 720px; margin: 0 auto; padding: 20px 16px; color: #1a1a1a; line-height: 1.5;">
   <style>
@@ -64,6 +64,7 @@
     #ahead-assessment .success h2 { color: #2e7d32; }
     #ahead-assessment .summary { background: #f8fafc; border-radius: 10px; padding: 16px; text-align: left; font-size: 0.9rem; margin: 20px 0; max-height: 240px; overflow-y: auto; }
     #ahead-assessment .footer-note { text-align: center; font-size: 0.8rem; color: #5a6a7a; margin-top: 24px; }
+    #ahead-assessment .sending { opacity: 0.7; pointer-events: none; }
     @media (max-width: 600px) {
       #ahead-assessment .card { padding: 24px 18px; }
       #ahead-assessment .nav-buttons { flex-direction: column-reverse; }
@@ -71,7 +72,7 @@
     }
   </style>
 
-  <h1>AHEAD HR Wisconsin</h1>
+  <h1>AHEAD HR and Staffing</h1>
   <p class="subtitle">Tell us about your needs — a local specialist will help you find the right payroll, HR, or staffing solution.</p>
 
   <div class="progress-wrap"><div class="progress-bar" id="ahead-progressBar"></div></div>
@@ -129,7 +130,19 @@
         <div class="option"><input type="radio" name="currentSetup" value="Using software only"><label>Using software only (QuickBooks, etc.)</label></div>
         <div class="option"><input type="radio" name="currentSetup" value="Accountant or bookkeeper"><label>Handled by an accountant or bookkeeper</label></div>
         <div class="option"><input type="radio" name="currentSetup" value="Existing provider"><label>Already with a payroll or HR provider</label></div>
+        <div class="option"><input type="radio" name="currentSetup" value="Already using a staffing agency"><label>Already using a staffing agency</label></div>
         <div class="option"><input type="radio" name="currentSetup" value="Mix of the above"><label>A mix of the above</label></div>
+      </div>
+      <div id="staffing-extra" style="display:none; margin-top:20px; padding-top:16px; border-top:1px solid #dde3ea;">
+        <p class="help-text" style="margin-bottom:12px;">Optional — tell us about your current staffing agency (you can skip this)</p>
+        <div class="form-group">
+          <label for="ahead-staffingAgency">Staffing agency name(s)</label>
+          <input type="text" id="ahead-staffingAgency" placeholder="Agency name(s)">
+        </div>
+        <div class="form-group">
+          <label for="ahead-staffingMarkup">Markup percentage (if known)</label>
+          <input type="text" id="ahead-staffingMarkup" placeholder="e.g. 45%, 1.45, etc.">
+        </div>
       </div>
     </div>
 
@@ -164,7 +177,7 @@
     <!-- Step 7: Contact -->
     <div class="step" data-step="7">
       <h2>Let’s talk about your needs</h2>
-      <p class="help-text">Share your contact information and a local AHEAD specialist will reach out to discuss the best options for your Wisconsin business.</p>
+      <p class="help-text">Share your contact information and a local AHEAD specialist will reach out. You’ll also receive a copy of your summary.</p>
       <div class="form-group">
         <label for="ahead-fullName">Full Name *</label>
         <input type="text" id="ahead-fullName" required placeholder="Your name">
@@ -195,9 +208,9 @@
     <div class="step" data-step="success">
       <div class="success">
         <h2>Thank you!</h2>
-        <p>A local AHEAD specialist will be in touch shortly to discuss your needs and how we can support your business.</p>
+        <p>Your request has been sent. A local AHEAD specialist will be in touch shortly.<br>A copy of your summary has also been emailed to you.</p>
         <div class="summary" id="ahead-summaryBox"></div>
-        <p style="font-size:0.9rem;">You can also reach us directly at [PHONE: confirm with Jim] or info@hrstaff.net.</p>
+        <p style="font-size:0.9rem;">You can also reach us directly at [PHONE: confirm with Jim] or support@hrstaff.net.</p>
       </div>
     </div>
 
@@ -212,6 +225,15 @@
 
 <script>
 (function() {
+  // ============================================================
+  // SETUP: Replace with your Formspree form ID
+  // 1. Go to https://formspree.io → Create free form
+  // 2. Set the email to support@hrstaff.net
+  // 3. Enable "Auto-Reply" and use the summary fields
+  // 4. Paste your form ID below (looks like xxxxxxxx)
+  // ============================================================
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'; // ← REPLACE THIS
+
   const totalSteps = 7;
   let currentStep = 1;
   const answers = {};
@@ -292,11 +314,54 @@
         return false;
       }
       answers[name] = selected.value;
+
+      // Optional staffing agency details (non-mandatory)
+      if (name === 'currentSetup' && selected.value === 'Already using a staffing agency') {
+        answers.staffingAgency = root.querySelector('#ahead-staffingAgency')?.value.trim() || '';
+        answers.staffingMarkup = root.querySelector('#ahead-staffingMarkup')?.value.trim() || '';
+      } else if (name === 'currentSetup') {
+        answers.staffingAgency = '';
+        answers.staffingMarkup = '';
+      }
     }
     return true;
   }
 
-  function buildSummary() {
+  function buildSummaryText() {
+    const lines = [];
+    const labels = {
+      companySize: 'Company Size',
+      industry: 'Industry',
+      primaryNeed: 'Primary Need',
+      currentSetup: 'Current Setup',
+      services: 'Services of Interest',
+      timeline: 'Timeline'
+    };
+    for (const [key, label] of Object.entries(labels)) {
+      if (answers[key]) {
+        const val = Array.isArray(answers[key]) ? answers[key].join(', ') : answers[key];
+        lines.push(`${label}: ${val}`);
+      }
+    }
+    if (answers.staffingAgency || answers.staffingMarkup) {
+      lines.push('');
+      if (answers.staffingAgency) lines.push(`Current Staffing Agency: ${answers.staffingAgency}`);
+      if (answers.staffingMarkup) lines.push(`Markup: ${answers.staffingMarkup}`);
+    }
+    if (answers.contact) {
+      lines.push('');
+      lines.push('--- Contact ---');
+      lines.push(`Name: ${answers.contact.fullName}`);
+      lines.push(`Email: ${answers.contact.email}`);
+      lines.push(`Company: ${answers.contact.company}`);
+      if (answers.contact.phone) lines.push(`Phone: ${answers.contact.phone}`);
+      if (answers.contact.role) lines.push(`Role: ${answers.contact.role}`);
+      if (answers.contact.notes) lines.push(`Notes: ${answers.contact.notes}`);
+    }
+    return lines.join('\n');
+  }
+
+  function buildSummaryHTML() {
     let html = '';
     const labels = {
       companySize: 'Company Size',
@@ -312,6 +377,11 @@
         html += `<div><strong>${label}:</strong> ${val}</div>`;
       }
     }
+    if (answers.staffingAgency || answers.staffingMarkup) {
+      html += `<hr style="margin:10px 0;border:none;border-top:1px solid #ddd;">`;
+      if (answers.staffingAgency) html += `<div><strong>Current Staffing Agency:</strong> ${answers.staffingAgency}</div>`;
+      if (answers.staffingMarkup) html += `<div><strong>Markup:</strong> ${answers.staffingMarkup}</div>`;
+    }
     if (answers.contact) {
       html += `<hr style="margin:10px 0;border:none;border-top:1px solid #ddd;">`;
       html += `<div><strong>Contact:</strong> ${answers.contact.fullName} (${answers.contact.email})</div>`;
@@ -323,12 +393,65 @@
     return html;
   }
 
-  btnNext.addEventListener('click', () => {
+  async function sendLead() {
+    const summary = buildSummaryText();
+    const payload = {
+      _subject: `New AHEAD HR Lead: ${answers.contact.company}`,
+      _replyto: answers.contact.email,
+      name: answers.contact.fullName,
+      email: answers.contact.email,
+      phone: answers.contact.phone || '',
+      company: answers.contact.company,
+      role: answers.contact.role || '',
+      notes: answers.contact.notes || '',
+      companySize: answers.companySize || '',
+      industry: answers.industry || '',
+      primaryNeed: answers.primaryNeed || '',
+      currentSetup: answers.currentSetup || '',
+      staffingAgency: answers.staffingAgency || '',
+      staffingMarkup: answers.staffingMarkup || '',
+      services: Array.isArray(answers.services) ? answers.services.join(', ') : (answers.services || ''),
+      timeline: answers.timeline || '',
+      fullSummary: summary
+    };
+
+    if (FORMSPREE_ENDPOINT.includes('YOUR_FORM_ID')) {
+      console.warn('Formspree not configured. Lead data:', payload);
+      alert('Form is in demo mode. Configure Formspree endpoint to enable email delivery.');
+      return true;
+    }
+
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Form submission failed');
+      return true;
+    } catch (err) {
+      console.error(err);
+      alert('There was a problem sending your request. Please call us at [PHONE: confirm with Jim] or email support@hrstaff.net.');
+      return false;
+    }
+  }
+
+  btnNext.addEventListener('click', async () => {
     if (!collectCurrentStep()) return;
     if (currentStep === totalSteps) {
-      root.querySelector('#ahead-summaryBox').innerHTML = buildSummary();
-      showStep('success');
-      console.log('AHEAD WI Lead captured:', answers);
+      btnNext.disabled = true;
+      btnNext.textContent = 'Sending...';
+      root.classList.add('sending');
+
+      const ok = await sendLead();
+      if (ok) {
+        root.querySelector('#ahead-summaryBox').innerHTML = buildSummaryHTML();
+        showStep('success');
+      } else {
+        btnNext.disabled = false;
+        btnNext.textContent = 'Request Contact';
+        root.classList.remove('sending');
+      }
       return;
     }
     showStep(currentStep + 1);
@@ -345,6 +468,14 @@
         opt.parentElement.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
         opt.classList.add('selected');
         input.checked = true;
+
+        // Show/hide staffing agency extra fields
+        if (input.name === 'currentSetup') {
+          const extra = root.querySelector('#staffing-extra');
+          if (extra) {
+            extra.style.display = (input.value === 'Already using a staffing agency') ? 'block' : 'none';
+          }
+        }
       } else {
         input.checked = !input.checked;
         opt.classList.toggle('selected', input.checked);
