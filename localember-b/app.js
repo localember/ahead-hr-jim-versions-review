@@ -619,7 +619,7 @@
 
   function talk() {
     var form = state.confirmed ? confirmBox() : callForm();
-    return "<section class=\"talk-wrap\"><div class=\"talk-copy\"><h2>Talk to AHEAD Human Resources</h2><p>An AHEAD advisor can review your situation, check the rules for your state and help you take the next step.</p><div class=\"contact\"><div><small>CALL</small><a href=\"tel:9205931208\">" + PHONE + "</a></div><button type=\"button\" class=\"ghost\" data-copy=\"" + PHONE + "\">Copy</button></div><div class=\"contact\"><div><small>EMAIL</small><a href=\"mailto:" + EMAIL + "\">" + EMAIL + "</a></div><button type=\"button\" class=\"ghost\" data-copy=\"" + EMAIL + "\">Copy</button></div><div class=\"book\"><a href=\"" + SCHEDULER + "\" target=\"_blank\" rel=\"noopener noreferrer\">Book a time with Jim</a><a href=\"" + SCHEDULER + "\" target=\"_blank\" rel=\"noopener noreferrer\">Book a time with Jen</a></div></div><div class=\"call-card\">" + form + "</div></section>";
+    return "<section class=\"talk-wrap\"><div class=\"talk-copy\"><h2>Talk to AHEAD Human Resources</h2><p>An AHEAD advisor can review your situation, check the rules for your state and help you take the next step.</p><div class=\"contact\"><div><small>CALL</small><a href=\"tel:9205931208\">" + PHONE + "</a></div><button type=\"button\" class=\"ghost\" data-copy=\"" + PHONE + "\">Copy</button></div><div class=\"contact\"><div><small>EMAIL</small><a href=\"mailto:" + EMAIL + "\">" + EMAIL + "</a></div><button type=\"button\" class=\"ghost\" data-copy=\"" + EMAIL + "\">Copy</button></div><div class=\"book\"><a href=\"" + SCHEDULER + "\" target=\"_blank\" rel=\"noopener noreferrer\">Book a time with Jim</a></div></div><div class=\"call-card\">" + form + "</div></section>";
   }
 
   function callForm() {
