@@ -188,7 +188,7 @@
     } else if (state.step === "thanks") {
       html = shell(
         "Thanks, " + n + ".",
-        "A few short questions, then AHEAD can follow up with pricing.",
+        "A few short questions.",
         "",
         nextButton("Continue") + backButton()
       );
@@ -282,7 +282,7 @@
           row("Email", state.email) +
           row("Phone", state.phone) +
         "</dl></div>" +
-        '<div class="pricing"><p>Someone from AHEAD will reach out with detailed information and pricing</p>' +
+        '<div class="pricing"><p>Thanks! Someone from our team will reach out to learn more about your needs and talk through the right setup for you.</p>' +
         '<a class="btn" href="' + SCHEDULER + '">Book a time with Jim</a></div>' +
         '<p class="fine">This preview only confirms what you entered. Nothing was sent.</p>' +
         '<div class="row-actions">' + backButton() + "</div>";
