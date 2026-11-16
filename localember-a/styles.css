@@ -145,6 +145,7 @@ input:focus, select:focus { outline: 2px solid var(--blue); border-color: var(--
   background: var(--soft);
   outline: none;
 }
+.other-box { margin-top: 6px; }
 .err { color: #9b2c2c; font-size: 0.95rem; margin: 8px 0 0; }
 .recap {
   background: #fff;

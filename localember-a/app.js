@@ -32,6 +32,37 @@
     "HRIS / workforce tools"
   ];
 
+  var STAFFING_CATEGORY = "Staffing or recruiting";
+
+  var STAFFING_SERVICES = [
+    "Temporary staffing",
+    "Temp-to-hire",
+    "Direct hire",
+    "Payrolling (client recruits, we employ)",
+    "Short-term / project-based",
+    "Long-term / ongoing",
+    "On-site management",
+    "Seasonal / peak demand",
+    "Volume / high-volume hiring",
+    "Specialized / skilled trades",
+    "Other"
+  ];
+
+  var JOB_CATEGORIES = [
+    "Light industrial",
+    "Warehouse / distribution",
+    "Machine operators",
+    "Assembly / production",
+    "General labor",
+    "Forklift / material handling",
+    "Packaging / shipping",
+    "Maintenance / facilities",
+    "Administrative / clerical",
+    "Customer service",
+    "Professional / skilled",
+    "Other"
+  ];
+
   var HANDLING = [
     "Doing it ourselves (in-house)",
     "Using software only (QuickBooks, etc.)",
@@ -87,6 +118,10 @@
     firstName: "",
     category: "",
     areas: [],
+    staffingServices: [],
+    staffingServicesOther: "",
+    jobCategories: [],
+    jobCategoriesOther: "",
     handling: "",
     industry: "",
     employees: "",
@@ -98,7 +133,7 @@
     error: ""
   };
 
-  var state = Object.assign({}, blank, { areas: [] });
+  var state = freshState();
   var moving = false;
   var app = document.getElementById("app");
 
@@ -114,8 +149,20 @@
     return state.firstName.trim();
   }
 
+  function freshState() {
+    return Object.assign({}, blank, {
+      areas: [],
+      staffingServices: [],
+      jobCategories: []
+    });
+  }
+
+  function isStaffing() {
+    return state.category === STAFFING_CATEGORY;
+  }
+
   function reset() {
-    state = Object.assign({}, blank, { areas: [] });
+    state = freshState();
     moving = false;
     render();
   }
@@ -136,6 +183,18 @@
   }
 
   function back() {
+    if (state.step === "staffingServices") {
+      go("category");
+      return;
+    }
+    if (state.step === "jobCategories") {
+      go("staffingServices");
+      return;
+    }
+    if (state.step === "areas" && isStaffing()) {
+      go("jobCategories");
+      return;
+    }
     var index = ORDER.indexOf(state.step);
     if (index > 0) go(ORDER[index - 1]);
   }
@@ -152,6 +211,11 @@
       var on = selected.indexOf(item) !== -1;
       return '<label class="choice' + (on ? " on" : "") + '"><input type="checkbox" value="' + esc(item) + '"' + (on ? " checked" : "") + '><span>' + esc(item) + "</span></label>";
     }).join("");
+  }
+
+  function otherBox(selected, inputId, value) {
+    if (selected.indexOf("Other") === -1) return "";
+    return '<div class="other-box"><label class="field" for="' + inputId + '">Describe</label><input id="' + inputId + '" type="text" value="' + esc(value) + '"></div>';
   }
 
   function shell(title, helper, body, actions) {
@@ -198,6 +262,20 @@
         "Pick one.",
         '<div class="choices">' + choiceButtons(CATEGORIES, state.category) + "</div>",
         backButton()
+      );
+    } else if (state.step === "staffingServices") {
+      html = shell(
+        "Staffing Services (type of placement)",
+        "Select all that apply.",
+        '<div class="choices">' + checkBoxes(STAFFING_SERVICES, state.staffingServices) + "</div>" + otherBox(state.staffingServices, "staffing-other", state.staffingServicesOther),
+        nextButton("Next") + backButton()
+      );
+    } else if (state.step === "jobCategories") {
+      html = shell(
+        "Industry / Job Categories (what type of workers they need)",
+        "Select all that apply.",
+        '<div class="choices">' + checkBoxes(JOB_CATEGORIES, state.jobCategories) + "</div>" + otherBox(state.jobCategories, "jobs-other", state.jobCategoriesOther),
+        nextButton("Next") + backButton()
       );
     } else if (state.step === "areas") {
       html = shell(
@@ -272,6 +350,10 @@
         '<div class="recap"><dl>' +
           row("Chatting with", state.firstName) +
           row("Looking for", state.category) +
+          (isStaffing()
+            ? row("Staffing services", withOther(state.staffingServices, state.staffingServicesOther)) +
+              row("Job categories", withOther(state.jobCategories, state.jobCategoriesOther))
+            : "") +
           row("Areas", state.areas.join(", ")) +
           row("Handling it now", state.handling) +
           row("Industry", state.industry) +
@@ -302,12 +384,38 @@
     return "<div><dt>" + esc(label) + "</dt><dd>" + esc(value || "—") + "</dd></div>";
   }
 
+  function withOther(list, otherText) {
+    return list.map(function (item) {
+      if (item === "Other" && otherText) return "Other: " + otherText;
+      return item;
+    }).join(", ");
+  }
+
   function readChecks() {
     var picked = [];
     app.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
       if (box.checked) picked.push(box.value);
     });
     return picked;
+  }
+
+  function captureListStep() {
+    if (state.step === "staffingServices") {
+      state.staffingServices = readChecks();
+      var staffingOther = app.querySelector("#staffing-other");
+      if (staffingOther) state.staffingServicesOther = staffingOther.value;
+    } else if (state.step === "jobCategories") {
+      state.jobCategories = readChecks();
+      var jobsOther = app.querySelector("#jobs-other");
+      if (jobsOther) state.jobCategoriesOther = jobsOther.value;
+    }
+  }
+
+  function clearStaffingAnswers() {
+    state.staffingServices = [];
+    state.staffingServicesOther = "";
+    state.jobCategories = [];
+    state.jobCategoriesOther = "";
   }
 
   function validEmail(value) {
@@ -330,6 +438,40 @@
     }
     if (state.step === "thanks") {
       go("category");
+      return;
+    }
+    if (state.step === "staffingServices") {
+      state.staffingServices = readChecks();
+      var staffingOther = app.querySelector("#staffing-other");
+      state.staffingServicesOther = staffingOther ? staffingOther.value.trim() : state.staffingServicesOther.trim();
+      if (!state.staffingServices.length) {
+        state.error = "Select at least one staffing service.";
+        render();
+        return;
+      }
+      if (state.staffingServices.indexOf("Other") !== -1 && !state.staffingServicesOther) {
+        state.error = "Describe the other staffing service.";
+        render();
+        return;
+      }
+      go("jobCategories");
+      return;
+    }
+    if (state.step === "jobCategories") {
+      state.jobCategories = readChecks();
+      var jobsOther = app.querySelector("#jobs-other");
+      state.jobCategoriesOther = jobsOther ? jobsOther.value.trim() : state.jobCategoriesOther.trim();
+      if (!state.jobCategories.length) {
+        state.error = "Select at least one job category.";
+        render();
+        return;
+      }
+      if (state.jobCategories.indexOf("Other") !== -1 && !state.jobCategoriesOther) {
+        state.error = "Describe the other job category.";
+        render();
+        return;
+      }
+      go("areas");
       return;
     }
     if (state.step === "areas") {
@@ -405,6 +547,7 @@
     var backHit = event.target.closest("[data-back]");
     if (backHit) {
       event.preventDefault();
+      captureListStep();
       back();
       return;
     }
@@ -420,7 +563,12 @@
     if (state.step === "category") {
       state.category = value;
       choice.classList.add("on");
-      goSoon("areas");
+      if (value === STAFFING_CATEGORY) {
+        goSoon("staffingServices");
+      } else {
+        clearStaffingAnswers();
+        goSoon("areas");
+      }
     } else if (state.step === "handling") {
       state.handling = value;
       choice.classList.add("on");
@@ -440,6 +588,10 @@
     if (event.target.type !== "checkbox") return;
     var label = event.target.closest(".choice");
     if (label) label.classList.toggle("on", event.target.checked);
+    if ((state.step === "staffingServices" || state.step === "jobCategories") && event.target.value === "Other") {
+      captureListStep();
+      render();
+    }
   });
 
   app.addEventListener("keydown", function (event) {
