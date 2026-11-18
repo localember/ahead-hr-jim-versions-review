@@ -11,23 +11,43 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="le-preview-banner" role="note">Design preview, not live. <a href="../">All versions</a></div>
-<header class="top">
-  <div class="top-inner">
-    <a class="brand" href="#start" id="brand-home">
-      <img src="ahead-logo-white.png" alt="AHEAD">
-      <span>
-        <strong>HR Issue Navigator</strong>
-        <em>by AHEAD Human Resources</em>
-      </span>
-    </a>
-    <button type="button" class="ghost" id="start-over">Start over</button>
+<div id="page-shell">
+  <div class="le-preview-banner" role="note">Design preview, not live. <a href="../">All versions</a></div>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="./">
+        <img src="ahead-logo-white.png" alt="AHEAD Human Resources">
+      </a>
+    </div>
+  </header>
+  <main class="page">
+    <section class="intro">
+      <h1>HR Issue Navigator</h1>
+      <p>The button opens the navigator, the same way it will on the site.</p>
+      <button type="button" class="btn" id="open-navigator">Open the navigator</button>
+      <p class="quiet">Nothing is sent from this preview.</p>
+    </section>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="nav-title">
+    <div class="dialog-bar">
+      <img class="modal-logo" src="ahead-logo-white.png" alt="AHEAD Human Resources">
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="start-over">Start over</button>
+        <button type="button" class="close" id="close-navigator" aria-label="Close">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <h2 id="nav-title" class="sr-only">HR Issue Navigator</h2>
+    <div id="app" class="stage" aria-live="polite"></div>
+    <footer class="fine">
+      <p>This guide gives general information to help you weigh your options. It isn't legal, tax or insurance advice. Rules vary by state and by company size, so confirm details with AHEAD or another qualified professional before you act.</p>
+    </footer>
   </div>
-</header>
-<main id="app" class="stage" aria-live="polite"></main>
-<footer class="fine">
-  <p>This guide gives general information to help you weigh your options. It isn't legal, tax or insurance advice. Rules vary by state and by company size, so confirm details with AHEAD or another qualified professional before you act.</p>
-</footer>
+</div>
 <noscript><p class="noscript">This preview needs JavaScript. Nothing is sent either way.</p></noscript>
 <script src="app.js"></script>
 </body>

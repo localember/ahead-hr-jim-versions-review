@@ -513,12 +513,15 @@
     return "<button type=\"button\" class=\"linkish\" data-go=\"" + screen + "\">" + esc(label) + "</button>";
   }
 
+  var lastScreen = "";
+
   function render() {
     var app = document.getElementById("app");
+    var changed = lastScreen !== state.screen;
+    lastScreen = state.screen;
     app.className = "stage";
     var html = "";
     if (state.screen === "name") html = screenName();
-    else if (state.screen === "thanks") html = screenThanks();
     else if (state.screen === "issues") html = screenIssues();
     else if (state.screen === "serious") html = screenSerious();
     else if (state.screen === "urgency") html = screenUrgency();
@@ -527,19 +530,25 @@
     else if (state.screen === "notes") html = screenNotes();
     else html = screenPlan();
     app.innerHTML = html;
-    app.style.animation = "none";
-    void app.offsetWidth;
-    app.style.animation = "";
+    if (changed) {
+      void app.offsetWidth;
+      app.classList.add("is-in");
+    }
     bind(app);
-    window.scrollTo(0, 0);
+    var dialog = document.querySelector(".dialog");
+    if (dialog) dialog.scrollTop = 0;
+    var overlayEl = document.getElementById("overlay");
+    if (changed && overlayEl && overlayEl.classList.contains("is-open") && state.screen !== "name") {
+      var heading = app.querySelector("h1");
+      if (heading) {
+        heading.setAttribute("tabindex", "-1");
+        heading.focus();
+      }
+    }
   }
 
   function screenName() {
-    return "<div class=\"narrow\"><p class=\"kicker\">AHEAD Human Resources</p><h1>Who am I chatting with?</h1><p class=\"helper\">Your first name is enough. We'll use it as we go.</p><label class=\"field\" for=\"first-name\">First name</label><input id=\"first-name\" type=\"text\" maxlength=\"40\" autocomplete=\"given-name\" value=\"" + esc(state.name) + "\"><p class=\"err\" id=\"name-err\"></p><div class=\"row-actions\"><button type=\"button\" class=\"btn\" id=\"name-next\">Continue</button></div></div>";
-  }
-
-  function screenThanks() {
-    return "<div class=\"narrow\"><h1>Thanks, " + esc(state.name) + ".</h1><p class=\"helper\">Three easy steps. Pick the issue, describe the situation, and get a plan.</p><div class=\"row-actions\"><button type=\"button\" class=\"btn\" data-go=\"issues\">Continue</button></div></div>";
+    return "<form class=\"narrow name-form\" id=\"name-form\"><p class=\"kicker\">AHEAD Human Resources</p><h1>Who am I chatting with?</h1><p class=\"helper\">Your first name is enough. We'll use it as we go.</p><label class=\"field\" for=\"first-name\">First name</label><input id=\"first-name\" type=\"text\" maxlength=\"40\" autocomplete=\"given-name\" enterkeyhint=\"go\" value=\"" + esc(state.name) + "\"><p class=\"hint\">Press Enter.</p><p class=\"err\" id=\"name-err\"></p><button type=\"submit\" class=\"sr-only\" id=\"name-next\" tabindex=\"-1\">Continue</button></form>";
   }
 
   function screenIssues() {
@@ -664,7 +673,8 @@
           state.lawsuit = "";
         }
         state.issueId = next;
-        go("serious");
+        el.classList.add("on");
+        advance(function () { go("serious"); });
       });
     });
     root.querySelectorAll("[data-serious]").forEach(function (el) {
@@ -689,24 +699,33 @@
         advance(function () { go("business"); });
       });
     });
-    var nameNext = root.querySelector("#name-next");
-    if (nameNext) {
+    var nameForm = root.querySelector("#name-form");
+    if (nameForm) {
       var input = root.querySelector("#first-name");
       function submitName() {
         var value = input.value.replace(/\s+/g, " ").trim();
         if (!value) {
           root.querySelector("#name-err").textContent = "Please add your first name.";
+          input.setAttribute("aria-invalid", "true");
           input.focus();
           return;
         }
+        input.removeAttribute("aria-invalid");
         state.name = value.slice(0, 40);
-        go("thanks");
+        go("issues");
       }
-      nameNext.addEventListener("click", submitName);
-      input.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") { event.preventDefault(); submitName(); }
+      nameForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        submitName();
       });
-      input.focus();
+      input.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          submitName();
+        }
+      });
+      var overlay = document.getElementById("overlay");
+      if (overlay && overlay.classList.contains("is-open")) input.focus();
     }
     var business = root.querySelector("#business-next");
     if (business) {
@@ -816,12 +835,76 @@
   document.getElementById("start-over").addEventListener("click", function () {
     if (state.screen !== "name" && !window.confirm("Start over? Your answers on this page will be cleared. Nothing was sent.")) return;
     state = blank();
+    lastScreen = "";
     render();
   });
 
-  document.getElementById("brand-home").addEventListener("click", function (event) {
-    event.preventDefault();
-    if (state.screen !== "name") go("issues");
+  var overlay = document.getElementById("overlay");
+  var openBtn = document.getElementById("open-navigator");
+  var closeBtn = document.getElementById("close-navigator");
+  var pageShell = document.getElementById("page-shell");
+  var lastFocus = null;
+
+  function focusable(dialog) {
+    var nodes = dialog.querySelectorAll("button, a[href], input, select, textarea");
+    var list = [];
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].disabled || nodes[i].tabIndex < 0) continue;
+      list.push(nodes[i]);
+    }
+    return list;
+  }
+
+  function openModal() {
+    lastFocus = document.activeElement;
+    overlay.classList.add("is-open");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    if (pageShell) {
+      pageShell.setAttribute("aria-hidden", "true");
+      pageShell.inert = true;
+    }
+    var input = document.getElementById("first-name");
+    if (state.screen === "name" && input) input.focus();
+    else if (closeBtn) closeBtn.focus();
+  }
+
+  function closeModal() {
+    overlay.classList.remove("is-open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    if (pageShell) {
+      pageShell.inert = false;
+      pageShell.removeAttribute("aria-hidden");
+    }
+    var back = lastFocus && lastFocus !== document.body ? lastFocus : openBtn;
+    if (back && back.focus) back.focus();
+  }
+
+  openBtn.addEventListener("click", openModal);
+  closeBtn.addEventListener("click", closeModal);
+  overlay.addEventListener("click", function (event) {
+    if (event.target === overlay) closeModal();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (!overlay.classList.contains("is-open")) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    var list = focusable(overlay.querySelector(".dialog"));
+    if (!list.length) return;
+    var first = list[0];
+    var last = list[list.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   });
 
   render();
@@ -843,16 +926,20 @@
     function wait(ms) { return new Promise(function (resolve) { window.setTimeout(resolve, ms); }); }
     function q(sel) { return document.querySelector(sel); }
     async function flow() {
+      assert(!document.getElementById("overlay").classList.contains("is-open"), "navigator starts closed");
+      q("#open-navigator").click();
+      assert(document.getElementById("overlay").classList.contains("is-open"), "button opens the popup");
       assert(h1() === "Who am I chatting with?", "opens with who am I chatting with, got: " + h1());
       assert(fits(), "name screen fits");
       q("#first-name").value = "Sam";
-      q("#name-next").click();
-      assert(h1() === "Thanks, Sam.", "thanks uses the name, got: " + h1());
-      q("[data-go='issues']").click();
+      q("#first-name").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      assert(h1() === "What problem are you dealing with?", "enter goes straight to the next question, got: " + h1());
+      assert(document.body.textContent.indexOf("Three easy steps") === -1, "thanks interstitial is gone");
       q("[data-group='all']").click();
       assert(document.querySelectorAll(".issue").length === 21, "21 issue cards");
       assert(fits(), "issue screen fits");
       q("[data-issue='problem']").click();
+      await wait(400);
       assert(h1().indexOf("Sam, how serious has it gotten?") === 0, "serious question uses the name");
       q("[data-serious='0']").click();
       await wait(400);
