@@ -474,7 +474,8 @@
       lawsuit: "",
       role: "",
       size: "",
-      usState: "Wisconsin",
+      usState: "",
+      path: "",
       notes: "",
       company: "",
       email: "",
@@ -500,7 +501,7 @@
   }
 
   function steps(n) {
-    var labels = ["1 Pick the issue", "2 Describe the situation", "3 Get your plan"];
+    var labels = ["1 Pick the issue", "2 Describe the situation", "3 Choose a path"];
     var html = "<ol class=\"steps\">";
     for (var i = 0; i < labels.length; i++) {
       var cls = i + 1 === n ? "on" : (i + 1 < n ? "done" : "");
@@ -587,43 +588,38 @@
   }
 
   function screenBusiness() {
-    return steps(2) + "<div class=\"narrow\"><p class=\"kicker\">Describe the situation</p><h1>" + esc(state.name) + ", tell us a little about your business</h1><p class=\"helper\">This helps us check which laws apply to you.</p><div class=\"grid-3\"><div><label class=\"field\" for=\"role\">Your role</label><select id=\"role\">" + options(ROLES, state.role, "Choose one") + "</select></div><div><label class=\"field\" for=\"size\">Company size</label><select id=\"size\">" + options(SIZES, state.size, "Choose one") + "</select></div><div><label class=\"field\" for=\"us-state\">State</label><select id=\"us-state\">" + options(STATES, state.usState || "Wisconsin", "") + "</select></div></div><p class=\"err\">" + esc(state.error) + "</p><div class=\"row-actions\"><button type=\"button\" class=\"btn\" id=\"business-next\">Continue</button></div>" + back(issue().lawsuit ? "lawsuit" : "urgency", "Back to the previous question") + "</div>";
+    return steps(2) + "<div class=\"narrow\"><p class=\"kicker\">Describe the situation</p><h1>" + esc(state.name) + ", tell us a little about your business</h1><p class=\"helper\">This helps us check which laws apply to you.</p><div class=\"grid-3\"><div><label class=\"field\" for=\"role\">Your role</label><select id=\"role\">" + options(ROLES, state.role, "Choose one") + "</select></div><div><label class=\"field\" for=\"size\">Company size</label><select id=\"size\">" + options(SIZES, state.size, "Choose one") + "</select></div><div><label class=\"field\" for=\"biz-location\">State</label><select id=\"biz-location\" name=\"biz-location\" autocomplete=\"off\">" + options(STATES, state.usState, "Choose one") + "</select></div></div><p class=\"err\">" + esc(state.error) + "</p><div class=\"row-actions\"><button type=\"button\" class=\"btn\" id=\"business-next\">Continue</button></div>" + back(issue().lawsuit ? "lawsuit" : "urgency", "Back to the previous question") + "</div>";
   }
 
   function screenNotes() {
-    return steps(2) + "<div class=\"narrow\"><p class=\"kicker\">Describe the situation</p><h1>" + esc(state.name) + ", what happened?</h1><p class=\"helper\">Tell us as much as you're willing to tell us about the situation.</p><textarea id=\"notes\" maxlength=\"2000\" placeholder=\"For example: A shift lead reported that her supervisor has made comments about her age in team meetings. She told me on Monday, and the supervisor has been here 8 years.\">" + esc(state.notes) + "</textarea><p class=\"count\"><span id=\"note-count\">" + state.notes.length + "</span> / 2,000 characters</p><p class=\"note\">Describe roles and events, not people. Leave out names, Social Security numbers, medical details and other personal information.</p><div class=\"row-actions\"><button type=\"button\" class=\"btn\" id=\"notes-next\">Next</button><button type=\"button\" class=\"btn secondary\" id=\"notes-skip\">Skip this question</button></div>" + back("business", "Back to the previous question") + "</div>";
+    return steps(2) + "<div class=\"narrow\"><p class=\"kicker\">Describe the situation</p><h1>" + esc(state.name) + ", what happened?</h1><p class=\"helper\">Tell us as much as you're willing to tell us about the situation.</p><textarea id=\"notes\" placeholder=\"For example: A shift lead reported that her supervisor has made comments about her age in team meetings. She told me on Monday, and the supervisor has been here 8 years.\">" + esc(state.notes) + "</textarea><p class=\"helper\">Describe roles and events, not people. Leave out names, Social Security numbers, medical details and other personal information.</p><div class=\"row-actions\"><button type=\"button\" class=\"btn\" id=\"notes-next\">Next</button><button type=\"button\" class=\"btn secondary\" id=\"notes-skip\">Skip this question</button></div>" + back("business", "Back to the previous question") + "</div>";
   }
 
   function screenPlan() {
     var item = issue();
-    var facts = [
-      ["First name", state.name],
-      ["Issue", item.title],
-      ["Category", item.group],
-      ["Situation", state.serious || "Not given"],
-      ["Urgency", state.urgency || "Not given"]
-    ];
-    if (item.lawsuit) facts.push(["Lawsuit filed", state.lawsuit || "Not given"]);
-    facts.push(["Your role", state.role || "Not given"]);
-    facts.push(["Company size", state.size || "Not given"]);
-    facts.push(["State", state.usState || "Not given"]);
-    var factHtml = facts.map(function (pair) {
-      return "<div><small>" + esc(pair[0]) + "</small><p>" + esc(pair[1]) + "</p></div>";
-    }).join("");
-    var plans = item.options.map(function (card, idx) {
-      var stepsHtml = card.steps.map(function (step) { return "<li>" + esc(step) + "</li>"; }).join("");
-      var meta = "";
-      if (card.who || card.timeline || card.cost) {
-        meta = "<div class=\"meta\">" + metaBit("Who helps", card.who) + metaBit("Timeline", card.timeline) + metaBit("Cost", card.cost) + "</div>";
-      }
-      return "<article class=\"plan" + (card.recommended ? " recommended" : "") + "\"><small>Option " + (idx + 1) + "</small> " + (card.recommended ? "<span class=\"badge\">Recommended for you</span>" : "") + "<h3>" + esc(card.title) + "</h3><p>" + esc(card.body) + "</p><ol>" + stepsHtml + "</ol>" + meta + "</article>";
-    }).join("");
-    return steps(3) + "<p class=\"kicker\">Get your plan</p><h1>" + esc(state.name) + ", here are your options for: " + esc(item.title) + "</h1><section class=\"recap\"><div class=\"recap-head\"><h2>What you told us</h2><button type=\"button\" class=\"linkish\" data-go=\"serious\">Edit answers</button></div><div class=\"facts\">" + factHtml + "</div><div><small>Your notes</small><p>" + esc(state.notes ? state.notes : "Not given") + "</p></div></section><div class=\"callouts\"><article class=\"callout do\"><p class=\"tag\">Do this first</p><p>" + esc(item.first) + "</p></article><article class=\"callout soon\"><p class=\"tag\">Time-sensitive</p><p>" + esc(item.urgent) + "</p></article></div><div class=\"plans\">" + plans + "</div>" + talk();
+    var ownOn = state.path === "own" ? " on" : "";
+    var aheadOn = state.path === "ahead" ? " on" : "";
+    var cards = "<div class=\"path-cards\"><button type=\"button\" class=\"path-card" + ownOn + "\" data-path=\"own\"><span class=\"path-kicker\">Option 1</span><strong>Keep handling it on my own</strong><em>A few tips for this issue.</em></button><button type=\"button\" class=\"path-card" + aheadOn + "\" data-path=\"ahead\"><span class=\"path-kicker\">Option 2</span><strong>Get expert help from AHEAD</strong><em>AHEAD drafts a plan to address it.</em></button></div>";
+    var panel = "";
+    if (state.path === "own") panel = ownPanel(item);
+    if (state.path === "ahead") panel = aheadPanel();
+    return steps(3) + "<p class=\"kicker\">Choose a path</p><h1>" + esc(state.name) + ", which path do you want?</h1><p class=\"helper\">Two ways forward. Pick the one you want.</p>" + cards + panel + back("notes", "Back to the previous question");
   }
 
-  function metaBit(label, value) {
-    if (!value) return "";
-    return "<div><small>" + esc(label) + "</small><p>" + esc(value) + "</p></div>";
+  function ownPanel(item) {
+    var tips = [];
+    if (item.first) tips.push(item.first);
+    if (item.urgent) tips.push(item.urgent);
+    var diy = item.options && item.options[0];
+    if (diy && diy.steps) {
+      for (var i = 0; i < diy.steps.length; i++) tips.push(diy.steps[i]);
+    }
+    var list = tips.slice(0, 5).map(function (tip) { return "<li>" + esc(tip) + "</li>"; }).join("");
+    return "<section class=\"path-panel\" id=\"path-own\"><h2>A few things that help</h2><ul class=\"path-tips\">" + list + "</ul><p class=\"alone\">You'll be navigating this on your own. You can reach out to AHEAD anytime.</p></section>";
+  }
+
+  function aheadPanel() {
+    return "<section class=\"path-panel\" id=\"path-ahead\"><h2>Get expert help from AHEAD</h2><p class=\"path-offer\">AHEAD drafts a plan to address it. No commitment, no obligation, and no cost to see how we can partner. You're one short reach out away from a full solution.</p>" + talk() + "</section>";
   }
 
   function talk() {
@@ -671,6 +667,7 @@
         if (next !== state.issueId) {
           state.serious = "";
           state.lawsuit = "";
+          state.path = "";
         }
         state.issueId = next;
         el.classList.add("on");
@@ -727,12 +724,45 @@
       var overlay = document.getElementById("overlay");
       if (overlay && overlay.classList.contains("is-open")) input.focus();
     }
+    var loc = root.querySelector("#biz-location");
+    if (loc) {
+      // The old id was us-state, under a label that says State. Browsers treat
+      // that as an address field and fill a saved state. Arizona showed up when
+      // nobody had picked it. Only a click or a key from the person counts.
+      var guard = true;
+      function lockLocation() {
+        if (!guard || !document.body.contains(loc)) return;
+        if (loc.value !== state.usState) loc.value = state.usState;
+      }
+      function markUser() {
+        guard = false;
+        loc.dataset.user = "1";
+      }
+      loc.addEventListener("pointerdown", markUser);
+      loc.addEventListener("keydown", function (event) {
+        if (event.key === "Tab" || event.key === "Shift") return;
+        markUser();
+      });
+      loc.addEventListener("change", function () {
+        if (!loc.dataset.user) {
+          loc.value = state.usState;
+          return;
+        }
+        state.usState = loc.value;
+      });
+      lockLocation();
+      var ticks = 0;
+      var timer = window.setInterval(function () {
+        ticks += 1;
+        lockLocation();
+        if (!guard || ticks > 20 || !document.body.contains(loc)) window.clearInterval(timer);
+      }, 100);
+    }
     var business = root.querySelector("#business-next");
     if (business) {
       business.addEventListener("click", function () {
         state.role = root.querySelector("#role").value;
         state.size = root.querySelector("#size").value;
-        state.usState = root.querySelector("#us-state").value;
         if (!state.role || !state.size || !state.usState) {
           state.error = "Please choose your role, company size, and state.";
           render();
@@ -743,11 +773,8 @@
     }
     var notes = root.querySelector("#notes");
     if (notes) {
-      notes.addEventListener("input", function () {
-        root.querySelector("#note-count").textContent = String(notes.value.length);
-      });
       root.querySelector("#notes-next").addEventListener("click", function () {
-        state.notes = notes.value.slice(0, 2000);
+        state.notes = notes.value;
         go("plan");
       });
       root.querySelector("#notes-skip").addEventListener("click", function () {
@@ -755,6 +782,22 @@
         go("plan");
       });
     }
+    root.querySelectorAll("[data-path]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var nameInput = root.querySelector("#call-name");
+        if (nameInput) {
+          state.name = nameInput.value.replace(/\s+/g, " ").trim() || state.name;
+          state.company = root.querySelector("#call-company").value.trim();
+          state.email = root.querySelector("#call-email").value.trim();
+          state.phone = root.querySelector("#call-phone").value.trim();
+          state.bestTime = root.querySelector("#call-time").value.trim();
+          state.include = root.querySelector("#call-include").checked;
+        }
+        state.path = el.getAttribute("data-path");
+        state.error = "";
+        render();
+      });
+    });
     root.querySelectorAll("[data-copy]").forEach(function (el) {
       el.addEventListener("click", function () { copyText(el.getAttribute("data-copy"), el); });
     });
@@ -949,19 +992,48 @@
       assert(h1().indexOf("lawsuit") !== -1, "lawsuit question for a problem employee");
       q("[data-lawsuit='No']").click();
       await wait(400);
+      assert(q("#biz-location").value === "", "state starts unpicked");
       q("#role").value = "Owner / operator";
       q("#size").value = "1 – 10 employees";
-      q("#us-state").value = "Wisconsin";
+      q("#biz-location").value = "Arizona";
+      q("#business-next").click();
+      assert(h1().indexOf("about your business") !== -1, "a state the person did not pick does not continue");
+      assert(q("#biz-location").value === "", "Arizona is not selected when it was not picked");
+      var loc = q("#biz-location");
+      loc.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+      loc.value = "Wisconsin";
+      loc.dispatchEvent(new Event("change", { bubbles: true }));
       q("#business-next").click();
       assert(h1().indexOf("Sam, what happened?") === 0, "what happened uses the name");
+      assert(document.querySelectorAll("#app textarea").length === 1, "one what-happened box");
+      assert(!q("#notes").hasAttribute("maxlength"), "what happened has no character limit");
+      q("#notes").value = new Array(2501).join("a");
+      q("#notes-next").click();
+      q("[data-go='notes']").click();
+      assert(q("#notes").value.length === 2500, "a long note is kept");
       q("#notes-skip").click();
       var plan = document.querySelector("#app").textContent;
-      assert(plan.indexOf("Write down specific incidents with dates. Then have a direct, private conversation about expectations.") !== -1, "problem employee do this first");
-      assert(plan.indexOf("If there's a safety threat, remove the person from the workplace now with paid administrative leave, then call AHEAD.") !== -1, "problem employee time-sensitive");
-      assert(plan.indexOf("AHEAD drafts the warnings, coaches your manager and keeps the paper trail consistent and defensible.") !== -1, "problem employee ahead plan");
-      assert(plan.indexOf("Recommended for you") !== -1, "recommended badge");
-      assert(plan.indexOf("What you told us") !== -1, "recap");
-      assert(plan.indexOf("upload") === -1 && plan.indexOf("Get my AHEAD") === -1, "no upload or AI plan");
+      assert(plan.indexOf("which path do you want?") !== -1, "path question");
+      assert(plan.indexOf("Keep handling it on my own") !== -1, "option 1");
+      assert(plan.indexOf("Get expert help from AHEAD") !== -1, "option 2");
+      assert(plan.indexOf("What you told us") === -1, "no answer recap");
+      assert(q("#biz-location") == null, "path screen has no state field");
+      assert(plan.indexOf("Arizona") === -1, "unpicked state is not shown");
+      assert(!q("#call-email"), "contact form stays hidden until a path is chosen");
+      q("[data-path='own']").click();
+      var own = document.querySelector("#app").textContent;
+      assert(own.indexOf("Write down specific incidents with dates. Then have a direct, private conversation about expectations.") !== -1, "option 1 shows tips for the issue");
+      assert(own.indexOf("navigating this on your own") !== -1, "option 1 says they are navigating it alone");
+      assert(own.indexOf("reach out to AHEAD anytime") !== -1, "option 1 says they can reach AHEAD");
+      assert(!q("#call-email"), "option 1 does not show the contact form");
+      assert(!q("#path-ahead"), "option 1 does not show the expert path");
+      q("[data-path='ahead']").click();
+      var ahead = document.querySelector("#app").textContent;
+      assert(q("#path-ahead") && q("#call-email") && q("#call-phone"), "option 2 shows the contact form");
+      assert(ahead.indexOf("No commitment, no obligation, and no cost") !== -1, "option 2 says there is no commitment");
+      assert(ahead.indexOf("What you told us") === -1, "option 2 does not recap answers");
+      assert(!q("#path-own"), "option 2 does not keep the tips panel");
+      assert(ahead.indexOf("upload") === -1 && ahead.indexOf("Get my AHEAD") === -1, "no upload or AI plan");
       assert(fits(), "plan screen fits");
       q("#call-email").value = "sam@example.com";
       q("#call-phone").value = "9205550100";
