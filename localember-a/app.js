@@ -1,4 +1,5 @@
-/* Preview only. This file never sends a request. */
+/* Preview only. This file never sends a request. Questions and options are Jim's
+   combined workflow, word for word. The end line is the preview wording. */
 (function () {
   "use strict";
 
@@ -10,132 +11,240 @@
     XMLHttpRequest.prototype.send = function () {};
   }
 
-  var SCHEDULER = "https://www.hrstaff.net/scheduler-demo/";
+  var STAFFING = "Staffing or recruiting";
+  var AGENCY = "Already using a staffing agency";
 
-  var CATEGORIES = [
-    "Payroll services",
-    "HR support & compliance",
-    "Full HR + payroll package",
-    "Staffing or recruiting",
-    "Workforce tools / HRIS (UKG)",
-    "Just exploring options"
-  ];
-
-  var AREAS = [
-    "Payroll processing & tax filings",
-    "Compliance & policy support",
-    "Benefits assistance",
-    "Employee handbook",
-    "Workers’ compensation help",
-    "Time & attendance",
-    "Recruiting or staffing",
-    "HRIS / workforce tools"
-  ];
-
-  var STAFFING_CATEGORY = "Staffing or recruiting";
-
-  var STAFFING_SERVICES = [
-    "Temporary staffing",
-    "Temp-to-hire",
-    "Direct hire",
-    "Payrolling (client recruits, we employ)",
-    "Short-term / project-based",
-    "Long-term / ongoing",
-    "On-site management",
-    "Seasonal / peak demand",
-    "Volume / high-volume hiring",
-    "Specialized / skilled trades",
-    "Other"
-  ];
-
-  var JOB_CATEGORIES = [
-    "Light industrial",
-    "Warehouse / distribution",
-    "Machine operators",
-    "Assembly / production",
-    "General labor",
-    "Forklift / material handling",
-    "Packaging / shipping",
-    "Maintenance / facilities",
-    "Administrative / clerical",
-    "Customer service",
-    "Professional / skilled",
-    "Other"
-  ];
-
-  var HANDLING = [
-    "Doing it ourselves (in-house)",
-    "Using software only (QuickBooks, etc.)",
-    "Handled by an accountant or bookkeeper",
-    "Already with a payroll or HR provider",
-    "Already using a staffing agency",
-    "A mix of the above"
-  ];
-
-  var INDUSTRIES = [
-    "Manufacturing",
-    "Retail",
-    "Healthcare",
-    "Hospitality",
-    "Service",
-    "Professional / Legal",
-    "Other"
-  ];
-
-  var SIZES = [
-    "1 – 10 employees",
-    "11 – 20 employees",
-    "21 – 50 employees",
-    "51 – 100 employees",
-    "101+ employees"
-  ];
-
-  var TIMELINES = [
-    "As soon as possible",
-    "Within the next 30 days",
-    "In the next 1–3 months",
-    "Just researching for now"
-  ];
-
-  var ORDER = [
-    "who",
-    "thanks",
-    "category",
-    "areas",
-    "handling",
-    "industry",
-    "employees",
-    "timeline",
-    "fullName",
-    "company",
-    "email",
-    "phone",
-    "done"
-  ];
-
-  var blank = {
-    step: "who",
-    firstName: "",
-    category: "",
-    areas: [],
-    staffingServices: [],
-    staffingServicesOther: "",
-    jobCategories: [],
-    jobCategoriesOther: "",
-    handling: "",
-    industry: "",
-    employees: "",
-    timeline: "",
-    fullName: "",
-    company: "",
-    email: "",
-    phone: "",
-    error: ""
+  var STEPS = {
+    primary: {
+      title: "What are you primarily looking for?",
+      help: "Select the main area you want help with.",
+      type: "single",
+      field: "primaryNeed",
+      options: [
+        "Payroll services",
+        "HR support & compliance",
+        "Full HR + payroll package",
+        "Staffing or recruiting",
+        "Workforce tools / HRIS (UKG)",
+        "Just exploring options"
+      ]
+    },
+    areas: {
+      title: "Which areas are most important to you?",
+      help: "Select all that apply.",
+      type: "multi",
+      field: "services",
+      options: [
+        "Payroll processing & tax filings",
+        "Compliance & policy support",
+        "Benefits assistance",
+        "Employee handbook",
+        "Workers\u2019 compensation help",
+        "Time & attendance",
+        "Recruiting or staffing",
+        "HRIS / workforce tools",
+        "Other"
+      ],
+      other: {
+        field: "otherServices",
+        label: "Please describe *",
+        placeholder: "Describe the other service or need",
+        message: "Please describe the other service or need."
+      }
+    },
+    setup: {
+      title: "How are you handling payroll and HR today?",
+      help: "This helps us understand the best next step for you.",
+      type: "single",
+      field: "currentSetup",
+      options: [
+        "Doing it ourselves (in-house)",
+        "Using software only (QuickBooks, etc.)",
+        "Handled by an accountant or bookkeeper",
+        "Already with a payroll or HR provider",
+        "Already using a staffing agency",
+        "A mix of the above"
+      ],
+      extraWhen: AGENCY,
+      extraHelp: "Optional \u2014 tell us about your current staffing agency (you can skip this)",
+      extraFields: [
+        { field: "staffingAgency", label: "Staffing agency name(s)", placeholder: "Agency name(s)" },
+        { field: "staffingMarkup", label: "Markup percentage (if known)", placeholder: "e.g. 45%, 1.45, etc." }
+      ]
+    },
+    industry: {
+      title: "What industry is your business in?",
+      help: "We support a wide range of Wisconsin businesses.",
+      type: "single",
+      field: "industry",
+      options: [
+        "Manufacturing",
+        "Retail",
+        "Healthcare",
+        "Hospitality",
+        "Service",
+        "Professional / Legal",
+        "Other"
+      ]
+    },
+    employees: {
+      title: "How many employees does your company have?",
+      help: "This helps us match the level of support that fits your business.",
+      type: "single",
+      field: "companySize",
+      options: [
+        "1 \u2013 10 employees",
+        "11 \u2013 20 employees",
+        "21 \u2013 50 employees",
+        "51 \u2013 100 employees",
+        "101+ employees"
+      ]
+    },
+    hrContact: {
+      title: "Let\u2019s talk about your needs",
+      help: "When are you hoping to get started, and how can we reach you?",
+      type: "contact",
+      bucket: "hr",
+      timeline: {
+        label: "When are you hoping to get started?",
+        options: ["ASAP", "30 days", "1\u20133 months", "Researching"]
+      },
+      fields: [
+        { field: "fullName", label: "Full Name *", placeholder: "Your name", required: true, autocomplete: "name" },
+        { field: "email", label: "Email *", type: "email", placeholder: "you@company.com", required: true, autocomplete: "email" },
+        { field: "phone", label: "Phone", type: "tel", placeholder: "(920) 555-0123", autocomplete: "tel" },
+        { field: "company", label: "Company Name *", placeholder: "Your company", required: true, autocomplete: "organization" },
+        { field: "role", label: "Your Role", placeholder: "e.g., Owner, Office Manager", autocomplete: "organization-title" },
+        { field: "notes", label: "Anything else we should know?", placeholder: "Optional notes", textarea: true }
+      ]
+    },
+    service: {
+      title: "What type of staffing do you need?",
+      help: "Select the main service that fits your situation.",
+      type: "single",
+      field: "serviceType",
+      options: [
+        "Temporary staffing",
+        "Temp-to-hire",
+        "Direct hire",
+        "Payrolling (you recruit, we employ)",
+        "Short-term / project-based",
+        "Long-term / ongoing",
+        "On-site management",
+        "Seasonal / peak demand",
+        "Volume / high-volume hiring",
+        "Specialized / skilled trades"
+      ]
+    },
+    jobs: {
+      title: "What type of workers do you need?",
+      help: "Select all that apply.",
+      type: "multi",
+      field: "jobCategories",
+      options: [
+        "Light industrial",
+        "Warehouse / distribution",
+        "Machine operators",
+        "Assembly / production",
+        "General labor",
+        "Forklift / material handling",
+        "Packaging / shipping",
+        "Maintenance / facilities",
+        "Administrative / clerical",
+        "Customer service",
+        "Professional / skilled",
+        "Construction / trades",
+        "Other"
+      ],
+      other: {
+        field: "otherJobs",
+        label: "Please describe *",
+        placeholder: "Describe the role or skill needed",
+        message: "Please describe the other role or skill."
+      }
+    },
+    workers: {
+      title: "How many workers do you need?",
+      help: "Approximate number is fine.",
+      type: "single",
+      field: "volume",
+      options: [
+        "1 \u2013 5",
+        "6 \u2013 15",
+        "16 \u2013 30",
+        "31 \u2013 50",
+        "51+",
+        "Ongoing / as needed"
+      ]
+    },
+    start: {
+      title: "When do you need them to start?",
+      help: "Select the timeline that best fits.",
+      type: "single",
+      field: "stTimeline",
+      options: [
+        "As soon as possible",
+        "Within 1 week",
+        "Within 2 weeks",
+        "Within 30 days",
+        "Just planning / exploring"
+      ]
+    },
+    stContact: {
+      title: "Let\u2019s get you connected",
+      help: "Share your details and a staffing specialist will reach out.",
+      type: "contact",
+      bucket: "st",
+      fields: [
+        { field: "fullName", label: "Full Name *", placeholder: "Your name", required: true, autocomplete: "name" },
+        { field: "email", label: "Email *", type: "email", placeholder: "you@company.com", required: true, autocomplete: "email" },
+        { field: "phone", label: "Phone", type: "tel", placeholder: "(920) 555-0123", autocomplete: "tel" },
+        { field: "company", label: "Company Name *", placeholder: "Your company", required: true, autocomplete: "organization" },
+        { field: "location", label: "Location / area", placeholder: "City or area in Wisconsin" },
+        { field: "notes", label: "Additional details", placeholder: "Shift times, certifications, experience level, etc.", textarea: true }
+      ]
+    }
   };
 
-  var state = freshState();
+  var HR_FLOW = ["primary", "areas", "setup", "industry", "employees", "hrContact"];
+  var ST_FLOW = ["primary", "service", "jobs", "workers", "start", "stContact"];
+  var THANKS = "Thanks! Someone from our team will reach out to learn more about your needs and talk through the right setup for you.";
+
+  var state = fresh();
+  var path = null;
+  var stepId = "primary";
   var moving = false;
-  var app = document.getElementById("app");
+  var timer = 0;
+  var open = false;
+  var opener = document.getElementById("open-pricing");
+  var overlay = document.getElementById("overlay");
+  var dialog = overlay.querySelector(".dialog");
+  var mount = document.getElementById("step-mount");
+  var bar = document.getElementById("bar");
+  var progress = document.getElementById("progress");
+  var stepLabel = document.getElementById("step-label");
+
+  function fresh() {
+    return {
+      primaryNeed: "",
+      services: [],
+      otherServices: "",
+      currentSetup: "",
+      staffingAgency: "",
+      staffingMarkup: "",
+      industry: "",
+      companySize: "",
+      timeline: "",
+      serviceType: "",
+      jobCategories: [],
+      otherJobs: "",
+      volume: "",
+      stTimeline: "",
+      error: "",
+      hr: { fullName: "", email: "", phone: "", company: "", role: "", notes: "" },
+      st: { fullName: "", email: "", phone: "", company: "", location: "", notes: "" }
+    };
+  }
 
   function esc(value) {
     return String(value == null ? "" : value)
@@ -145,468 +254,358 @@
       .replace(/"/g, "&quot;");
   }
 
-  function name() {
-    return state.firstName.trim();
+  function flow() {
+    return path === "staffing" ? ST_FLOW : HR_FLOW;
   }
 
-  function freshState() {
-    return Object.assign({}, blank, {
-      areas: [],
-      staffingServices: [],
-      jobCategories: []
+  function step() {
+    return STEPS[stepId] || null;
+  }
+
+  function readFields() {
+    var nodes = mount.querySelectorAll("[data-field]");
+    Array.prototype.forEach.call(nodes, function (el) {
+      var key = el.getAttribute("data-field");
+      var bucket = el.getAttribute("data-bucket");
+      if (bucket) state[bucket][key] = el.value;
+      else state[key] = el.value;
     });
   }
 
-  function isStaffing() {
-    return state.category === STAFFING_CATEGORY;
+  function choiceButton(label, pressed, kind, multi) {
+    return '<button type="button" class="choice' + (multi ? " multi" : "") + '" data-kind="' + kind + '" data-choice="' + esc(label) + '" aria-pressed="' + (pressed ? "true" : "false") + '"><span class="mark" aria-hidden="true"></span><span class="label">' + esc(label) + "</span></button>";
   }
 
-  function reset() {
-    state = freshState();
-    moving = false;
-    render();
+  function fieldHtml(field, bucket) {
+    var value = bucket ? state[bucket][field.field] : state[field.field];
+    var invalid = state.error && field.required && !String(value || "").trim() ? " aria-invalid=\"true\"" : "";
+    var common = ' id="f-' + esc(field.field) + '" data-field="' + esc(field.field) + '"' + (bucket ? ' data-bucket="' + bucket + '"' : "") + ' placeholder="' + esc(field.placeholder || "") + '"' + (field.autocomplete ? ' autocomplete="' + esc(field.autocomplete) + '"' : "") + invalid;
+    var control = field.textarea
+      ? "<textarea" + common + ">" + esc(value || "") + "</textarea>"
+      : '<input type="' + (field.type || "text") + '"' + common + ' value="' + esc(value || "") + '">';
+    return '<div class="field-block"><label class="field" for="f-' + esc(field.field) + '">' + esc(field.label) + "</label>" + control + "</div>";
   }
 
-  function go(step) {
-    state.step = step;
+  function actionsHtml(current) {
+    if (!current) return "";
+    var showBack = stepId !== "primary";
+    var showNext = current.type === "multi" || current.type === "contact" || !!current.extraWhen;
+    var holdNext = !!(current.extraWhen && state[current.field] !== current.extraWhen);
+    if (!showBack && !showNext) return "";
+    var nextLabel = current.type === "contact" ? "Request Pricing" : "Next";
+    return '<div class="actions">' +
+      (showBack ? '<button type="button" class="text-btn" data-back>Back</button>' : "<span></span>") +
+      (showNext ? '<button type="button" class="btn" data-next' + (holdNext ? " hidden" : "") + ">" + nextLabel + "</button>" : "<span></span>") +
+      "</div>";
+  }
+
+  function bodyHtml() {
+    if (stepId === "done") {
+      return '<div class="done"><div class="done-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8" fill="none" stroke="#04101f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2 id="step-title">' + esc(THANKS) + '</h2><button type="button" class="btn" data-close>Close</button></div>';
+    }
+    var current = step();
+    var html = '<h2 id="step-title" tabindex="-1">' + esc(current.title) + "</h2>";
+    if (current.help) html += '<p class="help">' + esc(current.help) + "</p>";
+
+    if (current.type === "single" || current.type === "multi") {
+      var selected = current.type === "multi" ? state[current.field] : [state[current.field]];
+      html += '<div class="choices" role="group" aria-labelledby="step-title">';
+      current.options.forEach(function (label) {
+        html += choiceButton(label, selected.indexOf(label) !== -1, current.type === "multi" ? "multi" : "single", current.type === "multi");
+      });
+      html += "</div>";
+      if (current.other) {
+        var showOther = state[current.field].indexOf("Other") !== -1;
+        html += '<div class="optional" id="other-box"' + (showOther ? "" : " hidden") + ">" + fieldHtml(current.other, "") + "</div>";
+      }
+      if (current.extraWhen) {
+        var showExtra = state[current.field] === current.extraWhen;
+        html += '<div class="optional" id="extra-box"' + (showExtra ? "" : " hidden") + ">";
+        html += '<p class="help">' + esc(current.extraHelp) + "</p>";
+        html += '<div class="stack">';
+        current.extraFields.forEach(function (field) { html += fieldHtml(field, ""); });
+        html += "</div></div>";
+      }
+    }
+
+    if (current.type === "contact") {
+      html += '<div class="stack">';
+      if (current.timeline) {
+        html += '<div class="field-block"><span class="field">' + esc(current.timeline.label) + '</span><div class="choices timeline" role="group" aria-label="' + esc(current.timeline.label) + '">';
+        current.timeline.options.forEach(function (label) {
+          html += choiceButton(label, state.timeline === label, "timeline", false);
+        });
+        html += "</div></div>";
+      }
+      current.fields.forEach(function (field) { html += fieldHtml(field, current.bucket); });
+      html += "</div>";
+    }
+
+    if (state.error) html += '<p class="err" role="alert" tabindex="-1">' + esc(state.error) + "</p>";
+    html += actionsHtml(current);
+    return html;
+  }
+
+  function setProgress() {
+    var steps = flow();
+    var index = stepId === "done" ? steps.length : Math.max(0, steps.indexOf(stepId));
+    var pct = stepId === "done" ? 100 : ((index + 1) / steps.length) * 100;
+    var now = stepId === "done" ? steps.length : index + 1;
+    progress.setAttribute("aria-valuemax", String(steps.length));
+    progress.setAttribute("aria-valuenow", String(now));
+    if (stepId === "done") {
+      stepLabel.textContent = "";
+      progress.hidden = false;
+    } else {
+      stepLabel.textContent = "Step " + (index + 1) + " of " + steps.length;
+    }
+    window.requestAnimationFrame(function () {
+      bar.style.width = pct + "%";
+    });
+  }
+
+  function render(opts) {
+    opts = opts || {};
+    mount.innerHTML = bodyHtml();
+    mount.classList.remove("step-in", "step-back");
+    if (opts.animate) {
+      void mount.offsetWidth;
+      mount.classList.add(opts.dir === "back" ? "step-back" : "step-in");
+    }
+    setProgress();
+    dialog.scrollTop = 0;
+    bindMount();
+    var focusEl = null;
+    if (state.error) focusEl = mount.querySelector("[aria-invalid='true']") || mount.querySelector(".err");
+    if (!focusEl) focusEl = mount.querySelector("#step-title");
+    if (focusEl && open) focusEl.focus();
+  }
+
+  function bindMount() {
+    Array.prototype.forEach.call(mount.querySelectorAll("[data-choice]"), function (btn) {
+      btn.addEventListener("click", function () { onChoice(btn); });
+    });
+    var next = mount.querySelector("[data-next]");
+    if (next) next.addEventListener("click", onNext);
+    var back = mount.querySelector("[data-back]");
+    if (back) back.addEventListener("click", onBack);
+    var closeDone = mount.querySelector("[data-close]");
+    if (closeDone) closeDone.addEventListener("click", closeModal);
+  }
+
+  function clearError() {
     state.error = "";
-    moving = false;
-    render();
+    var err = mount.querySelector(".err");
+    if (err) err.remove();
   }
 
-  function goSoon(step) {
+  function cancelMove() {
+    if (timer) window.clearTimeout(timer);
+    timer = 0;
+    moving = false;
+  }
+
+  function advanceSoon() {
     if (moving) return;
     moving = true;
-    window.setTimeout(function () {
-      go(step);
-    }, 160);
+    timer = window.setTimeout(function () {
+      timer = 0;
+      moving = false;
+      go(1);
+    }, 260);
   }
 
-  function back() {
-    if (state.step === "staffingServices") {
-      go("category");
+  function go(delta) {
+    readFields();
+    var steps = flow();
+    var index = steps.indexOf(stepId);
+    var next = steps[index + delta];
+    if (!next) return;
+    state.error = "";
+    stepId = next;
+    render({ animate: true, dir: delta < 0 ? "back" : "forward" });
+  }
+
+  function onChoice(btn) {
+    if (moving) return;
+    readFields();
+    clearError();
+    var kind = btn.getAttribute("data-kind");
+    var value = btn.getAttribute("data-choice");
+    var current = step();
+
+    if (kind === "multi") {
+      var list = state[current.field];
+      var at = list.indexOf(value);
+      if (at === -1) list.push(value);
+      else list.splice(at, 1);
+      btn.setAttribute("aria-pressed", list.indexOf(value) === -1 ? "false" : "true");
+      var otherBox = document.getElementById("other-box");
+      if (otherBox) otherBox.hidden = list.indexOf("Other") === -1;
       return;
     }
-    if (state.step === "jobCategories") {
-      go("staffingServices");
-      return;
-    }
-    if (state.step === "areas" && isStaffing()) {
-      go("jobCategories");
-      return;
-    }
-    var index = ORDER.indexOf(state.step);
-    if (index > 0) go(ORDER[index - 1]);
-  }
 
-  function choiceButtons(items, selected) {
-    return items.map(function (item) {
-      var on = item === selected ? " on" : "";
-      return '<button type="button" class="choice' + on + '" data-value="' + esc(item) + '"><span>' + esc(item) + "</span></button>";
-    }).join("");
-  }
-
-  function checkBoxes(items, selected) {
-    return items.map(function (item) {
-      var on = selected.indexOf(item) !== -1;
-      return '<label class="choice' + (on ? " on" : "") + '"><input type="checkbox" value="' + esc(item) + '"' + (on ? " checked" : "") + '><span>' + esc(item) + "</span></label>";
-    }).join("");
-  }
-
-  function otherBox(selected, inputId, value) {
-    if (selected.indexOf("Other") === -1) return "";
-    return '<div class="other-box"><label class="field" for="' + inputId + '">Describe</label><input id="' + inputId + '" type="text" value="' + esc(value) + '"></div>';
-  }
-
-  function shell(title, helper, body, actions) {
-    return (
-      '<p class="kicker">Request pricing</p>' +
-      "<h1>" + title + "</h1>" +
-      (helper ? '<p class="helper">' + helper + "</p>" : "") +
-      body +
-      (state.error ? '<p class="err" role="alert">' + esc(state.error) + "</p>" : "") +
-      '<div class="row-actions">' + actions + "</div>"
-    );
-  }
-
-  function backButton() {
-    if (state.step === "who") return "";
-    return '<button type="button" class="linkish" data-back="1">Back</button>';
-  }
-
-  function nextButton(label) {
-    return '<button type="button" class="btn" data-next="1">' + esc(label) + "</button>";
-  }
-
-  function render() {
-    var n = esc(name());
-    var html = "";
-
-    if (state.step === "who") {
-      html = shell(
-        "Who am I chatting with?",
-        "First name is enough for now.",
-        '<label class="field" for="first-name">First name</label><input id="first-name" type="text" autocomplete="given-name" value="' + esc(state.firstName) + '">',
-        nextButton("Request pricing")
-      );
-    } else if (state.step === "thanks") {
-      html = shell(
-        "Thanks, " + n + ".",
-        "A few short questions.",
-        "",
-        nextButton("Continue") + backButton()
-      );
-    } else if (state.step === "category") {
-      html = shell(
-        n + ", what are you primarily looking for?",
-        "Pick one.",
-        '<div class="choices">' + choiceButtons(CATEGORIES, state.category) + "</div>",
-        backButton()
-      );
-    } else if (state.step === "staffingServices") {
-      html = shell(
-        "Staffing Services (type of placement)",
-        "Select all that apply.",
-        '<div class="choices">' + checkBoxes(STAFFING_SERVICES, state.staffingServices) + "</div>" + otherBox(state.staffingServices, "staffing-other", state.staffingServicesOther),
-        nextButton("Next") + backButton()
-      );
-    } else if (state.step === "jobCategories") {
-      html = shell(
-        "Industry / Job Categories (what type of workers they need)",
-        "Select all that apply.",
-        '<div class="choices">' + checkBoxes(JOB_CATEGORIES, state.jobCategories) + "</div>" + otherBox(state.jobCategories, "jobs-other", state.jobCategoriesOther),
-        nextButton("Next") + backButton()
-      );
-    } else if (state.step === "areas") {
-      html = shell(
-        n + ", which areas are most important to you?",
-        "For " + esc(state.category) + ". Select all that apply.",
-        '<div class="choices">' + checkBoxes(AREAS, state.areas) + "</div>",
-        nextButton("Next") + backButton()
-      );
-    } else if (state.step === "handling") {
-      html = shell(
-        n + ", how are you handling payroll and HR today?",
-        "Pick one.",
-        '<div class="choices">' + choiceButtons(HANDLING, state.handling) + "</div>",
-        backButton()
-      );
-    } else if (state.step === "industry") {
-      html = shell(
-        n + ", what industry is your business in?",
-        "Pick one.",
-        '<div class="choices">' + choiceButtons(INDUSTRIES, state.industry) + "</div>",
-        backButton()
-      );
-    } else if (state.step === "employees") {
-      html = shell(
-        n + ", how many employees does your company have?",
-        "Pick one.",
-        '<div class="choices">' + choiceButtons(SIZES, state.employees) + "</div>",
-        backButton()
-      );
-    } else if (state.step === "timeline") {
-      var options = '<option value="">Select a timeline</option>' + TIMELINES.map(function (item) {
-        return '<option' + (item === state.timeline ? " selected" : "") + ">" + esc(item) + "</option>";
-      }).join("");
-      html = shell(
-        n + ", when are you hoping to get started?",
-        "One timeline is enough.",
-        '<label class="field" for="timeline">Timeline</label><select id="timeline">' + options + "</select>",
-        nextButton("Next") + backButton()
-      );
-    } else if (state.step === "fullName") {
-      html = shell(
-        n + ", what's your full name?",
-        "So AHEAD knows who to ask for.",
-        '<label class="field" for="full-name">Full name</label><input id="full-name" type="text" autocomplete="name" value="' + esc(state.fullName || state.firstName) + '">',
-        nextButton("Next") + backButton()
-      );
-    } else if (state.step === "company") {
-      html = shell(
-        n + ", what's the company name?",
-        "",
-        '<label class="field" for="company">Company</label><input id="company" type="text" autocomplete="organization" value="' + esc(state.company) + '">',
-        nextButton("Next") + backButton()
-      );
-    } else if (state.step === "email") {
-      html = shell(
-        n + ", what's the best email?",
-        "",
-        '<label class="field" for="email">Email</label><input id="email" type="email" autocomplete="email" inputmode="email" value="' + esc(state.email) + '">',
-        nextButton("Next") + backButton()
-      );
-    } else if (state.step === "phone") {
-      html = shell(
-        n + ", what's the best phone number?",
-        "",
-        '<label class="field" for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel" inputmode="tel" value="' + esc(state.phone) + '">',
-        nextButton("Next") + backButton()
-      );
-    } else {
-      html =
-        '<p class="kicker">Request pricing</p>' +
-        "<h1>Thanks, " + n + ". Here's what you told us.</h1>" +
-        '<div class="recap"><dl>' +
-          row("Chatting with", state.firstName) +
-          row("Looking for", state.category) +
-          (isStaffing()
-            ? row("Staffing services", withOther(state.staffingServices, state.staffingServicesOther)) +
-              row("Job categories", withOther(state.jobCategories, state.jobCategoriesOther))
-            : "") +
-          row("Areas", state.areas.join(", ")) +
-          row("Handling it now", state.handling) +
-          row("Industry", state.industry) +
-          row("Employees", state.employees) +
-          row("Timeline", state.timeline) +
-          row("Name", state.fullName) +
-          row("Company", state.company) +
-          row("Email", state.email) +
-          row("Phone", state.phone) +
-        "</dl></div>" +
-        '<div class="pricing"><p>Thanks! Someone from our team will reach out to learn more about your needs and talk through the right setup for you.</p>' +
-        '<a class="btn" href="' + SCHEDULER + '">Book a time with Jim</a></div>' +
-        '<p class="fine">This preview only confirms what you entered. Nothing was sent.</p>' +
-        '<div class="row-actions">' + backButton() + "</div>";
-    }
-
-    app.innerHTML = html;
-    var field = app.querySelector("input[type='text'], input[type='email'], input[type='tel'], select");
-    var heading = app.querySelector("h1");
-    if (field) field.focus();
-    else if (heading) {
-      heading.setAttribute("tabindex", "-1");
-      heading.focus();
-    }
-  }
-
-  function row(label, value) {
-    return "<div><dt>" + esc(label) + "</dt><dd>" + esc(value || "—") + "</dd></div>";
-  }
-
-  function withOther(list, otherText) {
-    return list.map(function (item) {
-      if (item === "Other" && otherText) return "Other: " + otherText;
-      return item;
-    }).join(", ");
-  }
-
-  function readChecks() {
-    var picked = [];
-    app.querySelectorAll('input[type="checkbox"]').forEach(function (box) {
-      if (box.checked) picked.push(box.value);
+    var group = btn.parentElement;
+    Array.prototype.forEach.call(group.querySelectorAll(".choice"), function (el) {
+      el.setAttribute("aria-pressed", el === btn ? "true" : "false");
     });
-    return picked;
-  }
 
-  function captureListStep() {
-    if (state.step === "staffingServices") {
-      state.staffingServices = readChecks();
-      var staffingOther = app.querySelector("#staffing-other");
-      if (staffingOther) state.staffingServicesOther = staffingOther.value;
-    } else if (state.step === "jobCategories") {
-      state.jobCategories = readChecks();
-      var jobsOther = app.querySelector("#jobs-other");
-      if (jobsOther) state.jobCategoriesOther = jobsOther.value;
+    if (kind === "timeline") {
+      state.timeline = value;
+      return;
     }
+
+    state[current.field] = value;
+    if (stepId === "primary") path = value === STAFFING ? "staffing" : "hr";
+
+    if (current.extraWhen) {
+      var show = value === current.extraWhen;
+      var extra = document.getElementById("extra-box");
+      if (extra) extra.hidden = !show;
+      var nextBtn = mount.querySelector("[data-next]");
+      if (nextBtn) nextBtn.hidden = !show;
+      if (show) return;
+      state.staffingAgency = "";
+      state.staffingMarkup = "";
+      if (extra) {
+        Array.prototype.forEach.call(extra.querySelectorAll("[data-field]"), function (el) { el.value = ""; });
+      }
+    }
+    advanceSoon();
   }
 
-  function clearStaffingAnswers() {
-    state.staffingServices = [];
-    state.staffingServicesOther = "";
-    state.jobCategories = [];
-    state.jobCategoriesOther = "";
-  }
-
-  function validEmail(value) {
+  function emailOk(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   }
 
-  function advance() {
-    state.error = "";
-    if (state.step === "who") {
-      var first = (app.querySelector("#first-name").value || "").trim();
-      if (!first) {
-        state.error = "Add your first name to continue.";
-        state.firstName = "";
-        render();
-        return;
+  function validate() {
+    var current = step();
+    if (!current) return "";
+    if (current.type === "multi") {
+      if (!state[current.field].length) return "Please select at least one option.";
+      if (current.other && state[current.field].indexOf("Other") !== -1 && !String(state[current.other.field] || "").trim()) {
+        return current.other.message;
       }
-      state.firstName = first;
-      go("thanks");
-      return;
     }
-    if (state.step === "thanks") {
-      go("category");
-      return;
+    if (current.type === "contact") {
+      var bag = state[current.bucket];
+      if (!bag.fullName.trim() || !bag.email.trim() || !bag.company.trim()) {
+        return "Please fill in Name, Email, and Company Name.";
+      }
+      if (!emailOk(bag.email.trim())) return "Please enter a valid email.";
+      if (current.timeline && !state.timeline) return "Please select when you are hoping to get started.";
     }
-    if (state.step === "staffingServices") {
-      state.staffingServices = readChecks();
-      var staffingOther = app.querySelector("#staffing-other");
-      state.staffingServicesOther = staffingOther ? staffingOther.value.trim() : state.staffingServicesOther.trim();
-      if (!state.staffingServices.length) {
-        state.error = "Select at least one staffing service.";
-        render();
-        return;
-      }
-      if (state.staffingServices.indexOf("Other") !== -1 && !state.staffingServicesOther) {
-        state.error = "Describe the other staffing service.";
-        render();
-        return;
-      }
-      go("jobCategories");
-      return;
-    }
-    if (state.step === "jobCategories") {
-      state.jobCategories = readChecks();
-      var jobsOther = app.querySelector("#jobs-other");
-      state.jobCategoriesOther = jobsOther ? jobsOther.value.trim() : state.jobCategoriesOther.trim();
-      if (!state.jobCategories.length) {
-        state.error = "Select at least one job category.";
-        render();
-        return;
-      }
-      if (state.jobCategories.indexOf("Other") !== -1 && !state.jobCategoriesOther) {
-        state.error = "Describe the other job category.";
-        render();
-        return;
-      }
-      go("areas");
-      return;
-    }
-    if (state.step === "areas") {
-      state.areas = readChecks();
-      if (!state.areas.length) {
-        state.error = "Select at least one area.";
-        render();
-        return;
-      }
-      go("handling");
-      return;
-    }
-    if (state.step === "timeline") {
-      var timeline = app.querySelector("#timeline").value;
-      if (!timeline) {
-        state.error = "Choose a timeline.";
-        render();
-        return;
-      }
-      state.timeline = timeline;
-      go("fullName");
-      return;
-    }
-    if (state.step === "fullName") {
-      var full = (app.querySelector("#full-name").value || "").trim();
-      if (!full) {
-        state.error = "Add your full name.";
-        render();
-        return;
-      }
-      state.fullName = full;
-      go("company");
-      return;
-    }
-    if (state.step === "company") {
-      var company = (app.querySelector("#company").value || "").trim();
-      if (!company) {
-        state.error = "Add the company name.";
-        render();
-        return;
-      }
-      state.company = company;
-      go("email");
-      return;
-    }
-    if (state.step === "email") {
-      var email = (app.querySelector("#email").value || "").trim();
-      if (!validEmail(email)) {
-        state.error = "Enter an email address.";
-        state.email = email;
-        render();
-        return;
-      }
-      state.email = email;
-      go("phone");
-      return;
-    }
-    if (state.step === "phone") {
-      var phone = (app.querySelector("#phone").value || "").trim();
-      var digits = phone.replace(/\D/g, "");
-      if (digits.length < 7) {
-        state.error = "Enter a phone number.";
-        state.phone = phone;
-        render();
-        return;
-      }
-      state.phone = phone;
-      go("done");
-    }
+    return "";
   }
 
-  app.addEventListener("click", function (event) {
-    var backHit = event.target.closest("[data-back]");
-    if (backHit) {
-      event.preventDefault();
-      captureListStep();
-      back();
+  function finish() {
+    readFields();
+    var err = validate();
+    if (err) {
+      state.error = err;
+      render({ animate: false });
       return;
     }
-    var nextHit = event.target.closest("[data-next]");
-    if (nextHit) {
-      event.preventDefault();
-      advance();
+    state.error = "";
+    stepId = "done";
+    render({ animate: true, dir: "forward" });
+  }
+
+  function onNext() {
+    if (moving) return;
+    readFields();
+    var current = step();
+    if (current && current.other && state[current.field].indexOf("Other") === -1) state[current.other.field] = "";
+    if (current && current.type === "contact") {
+      finish();
       return;
     }
-    var choice = event.target.closest("button.choice");
-    if (!choice) return;
-    var value = choice.getAttribute("data-value");
-    if (state.step === "category") {
-      state.category = value;
-      choice.classList.add("on");
-      if (value === STAFFING_CATEGORY) {
-        goSoon("staffingServices");
-      } else {
-        clearStaffingAnswers();
-        goSoon("areas");
+    var err = validate();
+    if (err) {
+      state.error = err;
+      render({ animate: false });
+      return;
+    }
+    state.error = "";
+    go(1);
+  }
+
+  function onBack() {
+    cancelMove();
+    if (stepId === "primary" || stepId === "done") return;
+    go(-1);
+  }
+
+  function focusables() {
+    return Array.prototype.filter.call(dialog.querySelectorAll("button, input, textarea"), function (el) {
+      if (el.disabled || el.hidden) return false;
+      if (el.closest("[hidden]")) return false;
+      return true;
+    });
+  }
+
+  function openModal() {
+    state = fresh();
+    path = null;
+    stepId = "primary";
+    cancelMove();
+    open = true;
+    document.body.style.overflow = "hidden";
+    overlay.setAttribute("aria-hidden", "false");
+    bar.style.width = "0%";
+    overlay.classList.add("is-open");
+    render({ animate: true, dir: "forward" });
+  }
+
+  function closeModal() {
+    if (!open) return;
+    cancelMove();
+    open = false;
+    overlay.classList.remove("is-open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    window.setTimeout(function () {
+      if (!open) mount.innerHTML = "";
+    }, 280);
+    if (opener) opener.focus();
+  }
+
+  opener.addEventListener("click", openModal);
+  document.getElementById("close-pricing").addEventListener("click", closeModal);
+  overlay.addEventListener("click", function (event) {
+    if (event.target === overlay) closeModal();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (!open) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeModal();
+      return;
+    }
+    if (event.key === "Enter") {
+      var target = event.target;
+      if (!target || target.tagName === "TEXTAREA" || target.tagName === "BUTTON") return;
+      if (target.tagName === "INPUT") {
+        var next = mount.querySelector("[data-next]");
+        if (next && !next.hidden) {
+          event.preventDefault();
+          onNext();
+        }
       }
-    } else if (state.step === "handling") {
-      state.handling = value;
-      choice.classList.add("on");
-      goSoon("industry");
-    } else if (state.step === "industry") {
-      state.industry = value;
-      choice.classList.add("on");
-      goSoon("employees");
-    } else if (state.step === "employees") {
-      state.employees = value;
-      choice.classList.add("on");
-      goSoon("timeline");
+      return;
     }
-  });
-
-  app.addEventListener("change", function (event) {
-    if (event.target.type !== "checkbox") return;
-    var label = event.target.closest(".choice");
-    if (label) label.classList.toggle("on", event.target.checked);
-    if ((state.step === "staffingServices" || state.step === "jobCategories") && event.target.value === "Other") {
-      captureListStep();
-      render();
-    }
-  });
-
-  app.addEventListener("keydown", function (event) {
-    if (event.key !== "Enter") return;
-    if (event.target.matches("input")) {
+    if (event.key !== "Tab") return;
+    var items = focusables();
+    if (!items.length) return;
+    var first = items[0];
+    var last = items[items.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
-      advance();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
     }
   });
-
-  document.getElementById("start-over").addEventListener("click", reset);
-  document.getElementById("brand-home").addEventListener("click", function (event) {
-    event.preventDefault();
-    reset();
-  });
-
-  render();
 })();

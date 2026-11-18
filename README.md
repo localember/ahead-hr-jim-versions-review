@@ -4,7 +4,7 @@ Preview only. Not the live site. Not for indexing.
 
 Latest:
 
-- /localember-a/ : Local Ember conversational version of Jim's logical needs form. One question at a time. Preview only. Nothing is sent.
+- /localember-a/ : Pricing form from Jim's combined workflow, opened as a popup from a Request Pricing button. Preview only. Nothing is sent.
 - /localember-b/ : Local Ember conversational version of Jim's emotional HR issue navigator. Preview only. Nothing is sent.
 - /claude/ : Jim's Claude HR Navigator (problem solving). The artifact at https://claude.ai/artifact/MgrHMgPKGgDWX5sWAD9j8T requires a Claude sign-in, so a standalone copy could not be captured. The page is a note plus the original link.
 - /grok/ : latest file from Jim's new public Grok share (ahead-hr-wisconsin-7step-email.html, header "AHEAD HR and Staffing").
