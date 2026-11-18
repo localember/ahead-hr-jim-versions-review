@@ -599,7 +599,7 @@
     var item = issue();
     var ownOn = state.path === "own" ? " on" : "";
     var aheadOn = state.path === "ahead" ? " on" : "";
-    var cards = "<div class=\"path-cards\"><button type=\"button\" class=\"path-card" + ownOn + "\" data-path=\"own\"><span class=\"path-kicker\">Option 1</span><strong>Keep handling it on my own</strong><em>A few tips for this issue.</em></button><button type=\"button\" class=\"path-card" + aheadOn + "\" data-path=\"ahead\"><span class=\"path-kicker\">Option 2</span><strong>Get expert help from AHEAD</strong><em>AHEAD drafts a plan to address it.</em></button></div>";
+    var cards = "<div class=\"path-cards\"><button type=\"button\" class=\"path-card" + ownOn + "\" data-path=\"own\"><span class=\"path-kicker\">Option 1</span><strong>Keep handling it on my own</strong><em>Still figuring out the rules, the paperwork, and the risk, navigating the chaos alone.</em></button><button type=\"button\" class=\"path-card" + aheadOn + "\" data-path=\"ahead\"><span class=\"path-kicker\">Option 2</span><strong>Get expert help from AHEAD</strong><em>AHEAD drafts a plan for you. No commitment, no obligation, and no cost to see how we can partner. You're one short reach out away.</em></button></div>";
     var panel = "";
     if (state.path === "own") panel = ownPanel(item);
     if (state.path === "ahead") panel = aheadPanel();
@@ -1015,7 +1015,10 @@
       var plan = document.querySelector("#app").textContent;
       assert(plan.indexOf("which path do you want?") !== -1, "path question");
       assert(plan.indexOf("Keep handling it on my own") !== -1, "option 1");
+      assert(plan.indexOf("Still figuring out the rules, the paperwork, and the risk, navigating the chaos alone.") !== -1, "option 1 card describes the slog");
       assert(plan.indexOf("Get expert help from AHEAD") !== -1, "option 2");
+      assert(plan.indexOf("No commitment, no obligation") !== -1, "option 2 card says no commitment before a click");
+      assert(!q("#path-own") && !q("#path-ahead"), "after-click panels stay hidden until a card is chosen");
       assert(plan.indexOf("What you told us") === -1, "no answer recap");
       assert(q("#biz-location") == null, "path screen has no state field");
       assert(plan.indexOf("Arizona") === -1, "unpicked state is not shown");

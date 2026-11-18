@@ -318,6 +318,57 @@ input:focus, select:focus, textarea:focus {
   background: var(--amber);
   box-shadow: inset 4px 0 0 var(--gold);
 }
+.path-card[data-path="own"] {
+  background: #f3f2ef;
+  border-color: #d5d3ce;
+  color: #6a655c;
+}
+.path-card[data-path="own"] strong { color: #5c574f; font-weight: 500; }
+.path-card[data-path="own"] em,
+.path-card[data-path="own"] .path-kicker { color: #7a756c; }
+.path-card[data-path="own"]:hover,
+.path-card[data-path="own"]:focus-visible {
+  border-color: #bdb8ae;
+  background: #efece7;
+  transform: none;
+  box-shadow: none;
+}
+.path-card[data-path="own"].on {
+  border-color: #bdb8ae;
+  background: #efece7;
+  box-shadow: inset 4px 0 0 #c8c2b6;
+}
+.path-card[data-path="ahead"] {
+  background: linear-gradient(180deg, #fffdf6 0%, #f8f3d0 100%);
+  border: 2px solid var(--gold);
+  box-shadow: 0 12px 28px rgba(215, 178, 1, 0.28);
+  color: var(--navy);
+}
+.path-card[data-path="ahead"] strong {
+  color: var(--navy);
+  font-size: 1.28rem;
+}
+.path-card[data-path="ahead"] em {
+  color: var(--navy);
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+.path-card[data-path="ahead"] .path-kicker {
+  color: var(--gold-ink);
+  font-weight: 700;
+}
+.path-card[data-path="ahead"]:hover,
+.path-card[data-path="ahead"]:focus-visible {
+  border-color: var(--gold-deep);
+  background: #fff8dc;
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px rgba(215, 178, 1, 0.34);
+}
+.path-card[data-path="ahead"].on {
+  border-color: var(--gold-deep);
+  background: var(--amber);
+  box-shadow: inset 4px 0 0 var(--gold), 0 12px 28px rgba(215, 178, 1, 0.22);
+}
 .path-panel {
   background: #fff;
   border: 1px solid var(--line);
